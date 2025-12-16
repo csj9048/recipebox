@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+build/
+
+# Capacitor
+ios/
+android/
+.capacitor/
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+
+# Editor
+.vscode/*
+.idea
+.DS_Store
+
+# Supabase
+.supabase/
