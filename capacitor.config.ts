@@ -1,15 +1,22 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.recipebox.app',
+  appId: 'com.myrecipebox.app',
   appName: 'RecipeBox',
-  webDir: 'dist',
+  webDir: 'build',
   server: {
     androidScheme: 'https'
+  },
+  ios: {
+    contentInset: 'automatic'
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 0
+    },
+    StatusBar: {
+      style: 'light',
+      backgroundColor: '#FDD360'
     }
   }
 };

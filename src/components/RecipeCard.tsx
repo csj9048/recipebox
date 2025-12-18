@@ -1,9 +1,8 @@
 import { Recipe } from '../types/recipe';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
-import { Trash2, Edit } from 'lucide-react';
+import { Trash2, Edit, UtensilsCrossed } from 'lucide-react';
 import { Button } from './ui/button';
-import defaultThumbnail from 'figma:asset/de36e1906579ee3e8d586d2ba9b30fae404f4e8b.png';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -15,17 +14,27 @@ interface RecipeCardProps {
 export function RecipeCard({ recipe, onDelete, onView, onEdit }: RecipeCardProps) {
   const situationTags = recipe.tags.filter(t => t.type === 'situation');
   const ingredientTags = recipe.tags.filter(t => t.type === 'ingredient');
+  
+  // Check if thumbnail exists and is a valid URL (not empty, null, or placeholder)
+  const hasValidThumbnail = recipe.thumbnail_url && 
+    recipe.thumbnail_url.trim() !== '' &&
+    recipe.thumbnail_url !== 'null' &&
+    recipe.thumbnail_url.startsWith('http');
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all border-gray-200 hover:border-[#FDD360] bg-white cursor-pointer" onClick={() => onView(recipe)}>
       <div className="flex gap-3 p-4">
-        {/* 왼쪽 썸네일 이미지 */}
-        <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
-          <img
-            src={recipe.thumbnail_url || defaultThumbnail}
-            alt={recipe.title || '레시피'}
-            className="w-full h-full object-cover"
-          />
+        {/* 왼쪽 썸네일 이미지 - show icon if no valid thumbnail */}
+        <div className="w-20 h-20 rounded-lg overflow-hidden bg-[#FDD360]/10 shrink-0 border border-[#FDD360]/20 flex items-center justify-center">
+          {hasValidThumbnail ? (
+            <img
+              src={recipe.thumbnail_url}
+              alt={recipe.title || '레시피'}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <UtensilsCrossed className="size-10 text-[#FDD360]" strokeWidth={1.5} />
+          )}
         </div>
 
         {/* 오른쪽 콘텐츠 */}
@@ -58,19 +67,34 @@ export function RecipeCard({ recipe, onDelete, onView, onEdit }: RecipeCardProps
             </div>
           </div>
           
-          <div className="flex flex-wrap gap-1">
-            {ingredientTags.slice(0, 3).map((tag, idx) => (
-              <Badge key={`ingredient-${idx}`} variant="outline" className="text-xs border-gray-300 text-gray-700 bg-gray-50">
-                #{tag.name}
-              </Badge>
-            ))}
-            {situationTags.slice(0, 3).map((tag, idx) => (
-              <Badge key={`situation-${idx}`} variant="secondary" className="text-xs bg-[#FDD360]/20 text-gray-800 border-[#FDD360]/30">
-                #{tag.name}
-              </Badge>
-            ))}
-            {(situationTags.length + ingredientTags.length > 6) && (
-              <span className="text-xs text-gray-400">...</span>
+          {/* Tags section - separated by type */}
+          <div className="space-y-1.5">
+            {/* Ingredient tags on first line */}
+            {ingredientTags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {ingredientTags.slice(0, 4).map((tag, idx) => (
+                  <Badge key={`ingredient-${idx}`} variant="outline" className="text-xs border-[#FDD360]/40 text-gray-700 bg-[#FDD360]/10">
+                    #{tag.name}
+                  </Badge>
+                ))}
+                {ingredientTags.length > 4 && (
+                  <span className="text-xs text-gray-400">+{ingredientTags.length - 4}</span>
+                )}
+              </div>
+            )}
+            
+            {/* Situation tags on second line */}
+            {situationTags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {situationTags.slice(0, 4).map((tag, idx) => (
+                  <Badge key={`situation-${idx}`} variant="secondary" className="text-xs bg-gray-100 text-gray-700 border-gray-300">
+                    #{tag.name}
+                  </Badge>
+                ))}
+                {situationTags.length > 4 && (
+                  <span className="text-xs text-gray-400">+{situationTags.length - 4}</span>
+                )}
+              </div>
             )}
           </div>
         </div>

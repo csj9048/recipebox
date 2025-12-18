@@ -395,23 +395,25 @@ export function AddRecipe({ onNavigateToList, editingRecipe }: AddRecipeProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile App Header */}
-      <div className="bg-[#FDD360] border-b border-gray-300 sticky top-0 z-10">
-        <div className="flex items-center justify-center px-4 py-3">
+    <div className="bg-white">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-200">
+        {/* Header content */}
+        <div className="flex items-center justify-center px-4 py-3 relative">
           <button 
             onClick={onNavigateToList}
-            className="absolute left-4 p-2 -ml-2 hover:bg-[#FDD360]/80 rounded-full transition-colors"
+            className="absolute left-4 p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <ChevronLeft className="size-6 text-gray-900" />
           </button>
-          <h1 className="text-gray-900" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
+          <h1 className="text-gray-900 text-center" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
             {editingRecipe ? '레시피 수정' : '새 레시피 추가'}
           </h1>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto">
+      {/* Content - no internal scroll, just flows */}
+      <div className="max-w-3xl mx-auto pb-24">
         <Card className="border-0 shadow-none rounded-none bg-white">
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -429,8 +431,14 @@ export function AddRecipe({ onNavigateToList, editingRecipe }: AddRecipeProps) {
                   <div className="relative border rounded-lg overflow-hidden bg-gray-50">
                     <img
                       src={thumbnail}
-                      alt="Thumbnail"
+                      alt={title || '레시피 사진'}
                       className="w-full max-h-64 object-contain"
+                      onError={(e) => {
+                        // If image fails to load, remove it
+                        e.currentTarget.style.display = 'none';
+                        setThumbnail('');
+                        setThumbnailFile(null);
+                      }}
                     />
                     <Button
                       type="button"
@@ -468,7 +476,15 @@ export function AddRecipe({ onNavigateToList, editingRecipe }: AddRecipeProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">레시피 설명</Label>
+                <Label htmlFor="bodyText">레시피 텍스트</Label>
+                <Textarea
+                  id="bodyText"
+                  value={bodyText}
+                  onChange={(e) => setBodyText(e.target.value)}
+                  placeholder="레시피 내용을 입력하거나, 이미지를 업로드 해주세요"
+                  rows={8}
+                  className="min-h-[200px]"
+                />
                 
                 {/* Hidden file input - support multiple files */}
                 <input
@@ -489,7 +505,7 @@ export function AddRecipe({ onNavigateToList, editingRecipe }: AddRecipeProps) {
                         onClick={() => setImageCollapsed(false)}
                         className="w-full py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
                       >
-                        이미지 {extractionImages.length}장 펼치기
+                        이미지 펼치기
                       </button>
                     ) : (
                       <>
@@ -560,7 +576,7 @@ export function AddRecipe({ onNavigateToList, editingRecipe }: AddRecipeProps) {
                           <button
                             type="button"
                             onClick={() => setImageCollapsed(true)}
-                            className="absolute bottom-0 left-0 right-0 w-full py-2 bg-gray-900/60 text-white hover:bg-gray-900/70 transition-colors text-sm backdrop-blur-sm"
+                            className="absolute bottom-0 left-0 right-0 w-full py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors text-sm"
                           >
                             이미지 접기
                           </button>
@@ -568,7 +584,7 @@ export function AddRecipe({ onNavigateToList, editingRecipe }: AddRecipeProps) {
                         
                         {/* Helper text - centered and shorter */}
                         <p className="text-sm text-gray-500 text-center">
-                          사진 속 레시피와 재료를 정리해드려요
+                          사진 속 레시피를 정리하고 재료 해시태그를 추가해드려요
                           {extractionImages.length > 1 && ' (모든 사진 종합)'}
                         </p>
                         
@@ -588,28 +604,6 @@ export function AddRecipe({ onNavigateToList, editingRecipe }: AddRecipeProps) {
                       </>
                     )}
                   </>
-                )}
-                
-                {/* Textarea */}
-                <Textarea
-                  id="description"
-                  value={bodyText}
-                  onChange={(e) => setBodyText(e.target.value)}
-                  placeholder="레시피 내용을 입력하거나, 이미지를 업로드 해주세요"
-                  rows={8}
-                />
-                
-                {/* Upload button - show when less than 2 images */}
-                {extractionImages.length < 2 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => extractionInputRef.current?.click()}
-                  >
-                    <Upload className="size-4 mr-2" />
-                    이미지 올리기 {extractionImages.length > 0 && `(${extractionImages.length}/2)`}
-                  </Button>
                 )}
               </div>
 
@@ -685,7 +679,7 @@ export function AddRecipe({ onNavigateToList, editingRecipe }: AddRecipeProps) {
                   value={memo}
                   onChange={(e) => setMemo(e.target.value)}
                   placeholder="예: 레시피대로 하니까 조금 짰음. 다음 번엔 소금 덜 넣기"
-                  rows={4}
+                  rows={2}
                 />
               </div>
 
