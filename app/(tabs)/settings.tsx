@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Modal, SafeAreaView } from 'react-native';
+import Constants from 'expo-constants';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Modal, SafeAreaView, Linking, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { Colors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,13 +11,11 @@ import { AuthModal } from '../../components/AuthModal';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import Toast from 'react-native-toast-message';
-// import * as Application from 'expo-application';
 
 export default function SettingsScreen() {
     const insets = useSafeAreaInsets();
     const [user, setUser] = useState<any>(null);
     const [authModalVisible, setAuthModalVisible] = useState(false);
-    const [termsVisible, setTermsVisible] = useState(false);
 
     const [imageError, setImageError] = useState(false);
 
@@ -122,8 +121,14 @@ export default function SettingsScreen() {
         ]);
     };
 
-    const handleFeedback = () => {
-        Alert.alert('의견 보내기', 'sujin@example.com 으로 의견을 보내주세요!');
+    const handleReview = () => {
+        if (Platform.OS === 'ios') {
+            // TODO: Replace with actual App ID after release
+            Linking.openURL('https://apps.apple.com/app/id6739487321?action=write-review');
+        } else {
+            const packageName = Constants.expoConfig?.android?.package || 'com.recipebox.app';
+            Linking.openURL(`market://details?id=${packageName}`);
+        }
     };
 
     const handleDeleteAccount = async () => {
@@ -195,7 +200,12 @@ export default function SettingsScreen() {
     };
 
     return (
-        <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style={[styles.container]}>
+            <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+                <View style={{ width: 40, height: 40 }} />
+                <Text style={styles.headerTitle}>설정</Text>
+                <View style={{ width: 40, height: 40 }} />
+            </View>
             <ScrollView contentContainerStyle={styles.content}>
                 {/* Header / Profile Section */}
                 <View style={styles.profileSection}>
@@ -240,19 +250,19 @@ export default function SettingsScreen() {
 
                 {/* Menu Items */}
                 <View style={styles.menuSection}>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => Alert.alert('앱 정보', `버전: 1.0.0`)}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => Alert.alert('앱 정보', `버전: ${Constants.expoConfig?.version || '1.0.0'}`)}>
                         <Ionicons name="information-circle-outline" size={24} color={Colors.text.primary} />
                         <Text style={styles.menuText}>앱 정보</Text>
                         <Ionicons name="chevron-forward" size={20} color={Colors.gray[300]} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.menuItem} onPress={handleFeedback}>
-                        <Ionicons name="mail-outline" size={24} color={Colors.text.primary} />
-                        <Text style={styles.menuText}>의견 보내기</Text>
+                    <TouchableOpacity style={styles.menuItem} onPress={handleReview}>
+                        <Ionicons name="star-outline" size={24} color={Colors.text.primary} />
+                        <Text style={styles.menuText}>리뷰 남기기</Text>
                         <Ionicons name="chevron-forward" size={20} color={Colors.gray[300]} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.menuItem} onPress={() => setTermsVisible(true)}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => Linking.openURL('https://bit.ly/45aSoSQ')}>
                         <Ionicons name="document-text-outline" size={24} color={Colors.text.primary} />
                         <Text style={styles.menuText}>서비스 이용 약관</Text>
                         <Ionicons name="chevron-forward" size={20} color={Colors.gray[300]} />
@@ -278,27 +288,6 @@ export default function SettingsScreen() {
                 onClose={() => setAuthModalVisible(false)}
                 onSuccess={checkUser}
             />
-
-            {/* Terms Modal (Simple Text for now) */}
-            <Modal visible={termsVisible} animationType="slide" presentationStyle="pageSheet">
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalHeader}>
-                        <Text style={styles.modalTitle}>서비스 이용 약관</Text>
-                        <TouchableOpacity onPress={() => setTermsVisible(false)}>
-                            <Text style={styles.closeText}>닫기</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <ScrollView style={styles.modalContent}>
-                        <Text style={styles.termsText}>
-                            제1조 (목적){'\n'}
-                            본 약관은 RecipeBox 서비스의 이용에 관한 제반 사항을 규정합니다.{'\n\n'}
-                            제2조 (이용){'\n'}
-                            사용자는 본 서비스를 개인적인 용도로 활용할 수 있습니다...{'\n\n'}
-                            (이하 생략)
-                        </Text>
-                    </ScrollView>
-                </View>
-            </Modal>
         </View>
     );
 }
@@ -307,6 +296,22 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.background,
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 12,
+        borderBottomWidth: 1,
+        borderColor: '#eee',
+        backgroundColor: Colors.primary,
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: Colors.text.primary,
     },
     content: {
         padding: 20,

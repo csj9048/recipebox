@@ -2,7 +2,7 @@
   "expo": {
     "name": "RecipeBox",
     "slug": "recipe-box",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,20 +11,18 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFC107"
+      "backgroundColor": "#FBBB02"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.recipebox.app"
+      "bundleIdentifier": "com.recipebox.app.testuser"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FDD360"
+        "backgroundColor": "#FBBB02"
       },
-      "package": "com.recipebox.app",
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "package": "com.recipebox.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"

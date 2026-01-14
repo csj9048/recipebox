@@ -474,7 +474,7 @@ export function AddRecipe() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 10, backgroundColor: Colors.primary, borderBottomWidth: 0 }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
           <Ionicons name="chevron-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>

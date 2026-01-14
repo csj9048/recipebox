@@ -177,7 +177,7 @@ export default function MealScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerButton}>
           {!isCurrentWeek && (
             <TouchableOpacity onPress={() => setViewingWeekStart(currentWeekStart)} style={styles.arrowButton}>
@@ -372,9 +372,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingBottom: 12,
     borderBottomWidth: 1,
-    borderColor: '#eee'
+    borderColor: '#eee',
+    backgroundColor: Colors.primary,
   },
   headerButton: {
     width: 40,

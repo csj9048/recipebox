@@ -186,10 +186,10 @@ export default function ShoppingScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top }]}>
-        <View style={{ width: 40 }} />
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <View style={{ width: 40, height: 40 }} />
         <Text style={styles.headerTitle}>장보기</Text>
-        <TouchableOpacity onPress={handleReset} style={{ width: 40, alignItems: 'center', justifyContent: 'center' }}>
+        <TouchableOpacity onPress={handleReset} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
           <Ionicons name="trash-bin-outline" size={24} color={Colors.error} />
         </TouchableOpacity>
       </View>
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.primary,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border.light,
   },

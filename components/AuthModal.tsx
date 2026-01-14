@@ -87,8 +87,12 @@ export function AuthModal({ visible, onClose, onSuccess }: AuthModalProps) {
                 }
             }
         } catch (error: any) {
-            console.error(error);
-            Alert.alert('오류', error.message || '요청 처리에 실패했습니다.');
+            // console.error(error); // Suppress dev toast
+            let msg = error.message || '요청 처리에 실패했습니다.';
+            if (msg.includes('Invalid login credentials')) {
+                msg = '계정이 없거나 비밀번호가 틀렸습니다.';
+            }
+            Alert.alert('오류', msg);
         } finally {
             setLoading(false);
         }
@@ -212,6 +216,41 @@ export function AuthModal({ visible, onClose, onSuccess }: AuthModalProps) {
                             </Text>
                         </TouchableOpacity>
 
+                        {isLogin && (
+                            <TouchableOpacity
+                                style={styles.forgotPasswordButton}
+                                onPress={() => {
+                                    if (!email) {
+                                        Alert.alert('알림', '이메일을 입력해주세요.');
+                                        return;
+                                    }
+                                    Alert.alert(
+                                        '비밀번호 재설정',
+                                        `${email}로 비밀번호 재설정 메일을 보내시겠습니까?`,
+                                        [
+                                            { text: '취소', style: 'cancel' },
+                                            {
+                                                text: '보내기',
+                                                onPress: async () => {
+                                                    try {
+                                                        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                                                            redirectTo: 'recipebox://reset-password',
+                                                        });
+                                                        if (error) throw error;
+                                                        Alert.alert('전송 완료', '비밀번호 재설정 메일이 전송되었습니다.\n메일함을 확인해주세요.');
+                                                    } catch (e: any) {
+                                                        Alert.alert('오류', e.message || '전송에 실패했습니다.');
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    );
+                                }}
+                            >
+                                <Text style={styles.forgotPasswordText}>비밀번호를 잊으셨나요?</Text>
+                            </TouchableOpacity>
+                        )}
+
 
                     </View>
                 </View>
@@ -302,5 +341,15 @@ const styles = StyleSheet.create({
         color: Colors.gray[400],
         textAlign: 'left',
         marginTop: 4,
+    },
+    forgotPasswordButton: {
+        alignItems: 'center',
+        padding: 8,
+        marginTop: -8,
+    },
+    forgotPasswordText: {
+        color: Colors.gray[500],
+        fontSize: 13,
+        textDecorationLine: 'underline',
     },
 });

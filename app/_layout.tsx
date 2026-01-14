@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import * as Linking from 'expo-linking';
 import { supabase } from '../utils/supabase/client';
 import Toast from 'react-native-toast-message';
@@ -57,6 +58,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
       </Stack>
       <Toast position='bottom' bottomOffset={90} />
+      <StatusBar style="dark" backgroundColor="#FDD360" />
     </>
   );
 }
