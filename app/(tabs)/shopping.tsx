@@ -5,6 +5,7 @@ import { Colors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../utils/supabase/client';
 import Toast from 'react-native-toast-message';
+import analytics from '@react-native-firebase/analytics';
 import { useFocusEffect } from 'expo-router';
 
 interface ShoppingItem {
@@ -74,7 +75,12 @@ export default function ShoppingScreen() {
       if (error) throw error;
 
       setNewItemText('');
+      setNewItemText('');
       fetchItems();
+      await analytics().logEvent('shopping_added', {
+        item: newItemText.trim(),
+        method: 'manual'
+      });
     } catch (error) {
       console.error('Error adding item:', error);
       Toast.show({ type: 'error', text1: '추가 실패' });

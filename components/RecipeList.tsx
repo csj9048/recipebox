@@ -7,6 +7,7 @@ import { supabase } from '../utils/supabase/client';
 import { Colors } from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
+import analytics from '@react-native-firebase/analytics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getGuestRecipes, deleteGuestRecipe } from '../utils/storage';
 
@@ -72,10 +73,8 @@ export function RecipeList() {
       if (!user) {
         await deleteGuestRecipe(id);
         setRecipes((prev) => prev.filter((r) => r.id !== id));
-        Toast.show({
-          type: 'success',
-          text1: '레시피가 삭제되었습니다',
-        });
+        await deleteGuestRecipe(id);
+        setRecipes((prev) => prev.filter((r) => r.id !== id));
         return;
       }
 
@@ -83,10 +82,9 @@ export function RecipeList() {
       if (error) throw error;
 
       setRecipes((prev) => prev.filter((r) => r.id !== id));
-      Toast.show({
-        type: 'success',
-        text1: '레시피가 삭제되었습니다',
-      });
+      if (error) throw error;
+
+      setRecipes((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
       console.error(err);
       Toast.show({
@@ -145,6 +143,13 @@ export function RecipeList() {
             placeholderTextColor={Colors.gray[400]}
             value={searchQuery}
             onChangeText={setSearchQuery}
+            onSubmitEditing={async () => {
+              if (searchQuery.trim()) {
+                await analytics().logEvent('hashtag_search', {
+                  term: searchQuery.trim(),
+                });
+              }
+            }}
           />
         </View>
       </View>

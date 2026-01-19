@@ -11,7 +11,9 @@ import { supabase } from '../utils/supabase/client';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { saveGuestRecipe } from '../utils/storage';
+import { saveGuestRecipe, updateGuestRecipe, getGuestRecipes } from '../utils/storage';
+import { convertImageToBase64, uploadImage } from '../utils/image';
+import analytics from '@react-native-firebase/analytics';
 
 export function AddRecipe() {
   const router = useRouter();
@@ -42,13 +44,25 @@ export function AddRecipe() {
 
   const loadRecipe = async () => {
     try {
-      const { data, error } = await supabase
-        .from('recipes')
-        .select('*')
-        .eq('id', params.id)
-        .single();
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (error) throw error;
+      let data: Recipe | null = null;
+
+      if (!user) {
+        // Load from guest storage
+        const guestRecipes = await getGuestRecipes();
+        data = guestRecipes.find(r => r.id === params.id) || null;
+      } else {
+        // Load from Supabase
+        const { data: remoteData, error } = await supabase
+          .from('recipes')
+          .select('*')
+          .eq('id', params.id)
+          .single();
+        if (error) throw error;
+        data = remoteData;
+      }
+
       if (data) {
         setEditingRecipe(data);
         setTitle(data.title || '');
@@ -105,10 +119,6 @@ export function AddRecipe() {
     if (!result.canceled && result.assets[0]) {
       setThumbnailUri(result.assets[0].uri);
       setThumbnail(result.assets[0].uri);
-      Toast.show({
-        type: 'success',
-        text1: '이미지가 추가되었습니다',
-      });
     }
   };
 
@@ -141,10 +151,6 @@ export function AddRecipe() {
       setExtractionImages([...extractionImages, ...newUris]);
       setExtractionImageUris([...extractionImageUris, ...newUris]);
       setCurrentImageIndex(extractionImages.length);
-      Toast.show({
-        type: 'success',
-        text1: `이미지 ${result.assets.length}장이 추가되었습니다`,
-      });
     }
   };
 
@@ -160,20 +166,7 @@ export function AddRecipe() {
       setCurrentImageIndex(0);
       setImageCollapsed(false);
     }
-
-    Toast.show({
-      type: 'success',
-      text1: '이미지가 삭제되었습니다',
-    });
   };
-
-  const convertImageToBase64 = async (uri: string): Promise<string> => {
-    const base64 = await FileSystem.readAsStringAsync(uri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-    return `data:image/jpeg;base64,${base64}`;
-  };
-
   const handleAnalyzeImage = async () => {
     if (extractionImageUris.length === 0) {
       Toast.show({
@@ -182,6 +175,8 @@ export function AddRecipe() {
       });
       return;
     }
+
+    await analytics().logEvent('click_ai_recipe');
 
     setAnalyzing(true);
     try {
@@ -269,32 +264,6 @@ export function AddRecipe() {
     setIngredientTags(ingredientTags.filter((tag) => tag !== tagToRemove));
   };
 
-  const uploadImage = async (base64: string, fileName: string, fileType: string): Promise<string> => {
-    const response = await fetch(
-      `https://${projectId}.supabase.co/functions/v1/server/upload-image`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${publicAnonKey}`,
-        },
-        body: JSON.stringify({
-          fileBase64: base64,
-          fileName,
-          fileType,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error uploading image:', errorData);
-      throw new Error('이미지 업로드 실패');
-    }
-
-    const { publicUrl } = await response.json();
-    return publicUrl;
-  };
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -320,32 +289,52 @@ export function AddRecipe() {
 
       // Guest Mode
       if (!user) {
+        console.log('--- Guest Mode Save Debug ---');
         let savedImageUrl = null;
         if (extractionImageUris.length > 0) {
           try {
             const savedUris = [];
             for (const uri of extractionImageUris) {
-              // If it's already a local file but not in our doc dir? 
-              // ImagePicker gives cache dir. Copy to doc dir.
-              const fileName = uri.split('/').pop();
-              const newPath = (FileSystem.documentDirectory || '') + 'guest_' + fileName;
-              await FileSystem.copyAsync({ from: uri, to: newPath });
-              savedUris.push(newPath);
+              const fileName = uri.split('/').pop() || `image_${Date.now()}.jpg`;
+              const docDir = FileSystem.documentDirectory;
+              if (!docDir) throw new Error('Document directory null');
+
+              const newPath = docDir + 'guest_' + fileName;
+              console.log('Img Process:', uri, '->', newPath);
+
+              if (!uri.startsWith(docDir)) {
+                console.log('Copying image...');
+                await FileSystem.copyAsync({ from: uri, to: newPath });
+                savedUris.push(newPath);
+              } else {
+                console.log('Skipping copy');
+                savedUris.push(uri);
+              }
             }
             savedImageUrl = JSON.stringify(savedUris);
           } catch (e) {
             console.error('Guest image save failed', e);
-            savedImageUrl = JSON.stringify(extractionImageUris); // Fallback
+            savedImageUrl = JSON.stringify(extractionImageUris);
           }
         }
 
         let savedThumbnail = null;
         if (thumbnailUri) {
           try {
-            const fileName = thumbnailUri.split('/').pop();
-            const newPath = (FileSystem.documentDirectory || '') + 'guest_thumb_' + fileName;
-            await FileSystem.copyAsync({ from: thumbnailUri, to: newPath });
-            savedThumbnail = newPath;
+            const fileName = thumbnailUri.split('/').pop() || `thumb_${Date.now()}.jpg`;
+            const docDir = FileSystem.documentDirectory;
+            if (docDir) {
+              const newPath = docDir + 'guest_thumb_' + fileName;
+              console.log('Thumb Process:', thumbnailUri, '->', newPath);
+
+              if (!thumbnailUri.startsWith(docDir)) {
+                console.log('Copying thumb...');
+                await FileSystem.copyAsync({ from: thumbnailUri, to: newPath });
+                savedThumbnail = newPath;
+              } else {
+                savedThumbnail = thumbnailUri;
+              }
+            }
           } catch (e) {
             console.error('Guest thumb save failed', e);
             savedThumbnail = thumbnailUri;
@@ -353,7 +342,7 @@ export function AddRecipe() {
         }
 
         const newRecipe: Recipe = {
-          id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+          id: editingRecipe ? editingRecipe.id : Date.now().toString(36) + Math.random().toString(36).substr(2),
           user_id: null,
           title: title.trim(),
           body_text: bodyText.trim(),
@@ -364,11 +353,20 @@ export function AddRecipe() {
           ],
           thumbnail_url: savedThumbnail,
           image_url: savedImageUrl,
-          created_at: new Date().toISOString(),
+          created_at: editingRecipe ? editingRecipe.created_at : new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
 
-        await saveGuestRecipe(newRecipe);
+        console.log('Saving Guest Recipe:', JSON.stringify(newRecipe, null, 2));
+
+        if (editingRecipe) {
+          const { updateGuestRecipe } = require('../utils/storage');
+          await updateGuestRecipe(newRecipe);
+        } else {
+          await saveGuestRecipe(newRecipe);
+        }
+
+        console.log('Guest Save Done');
         router.back();
         return;
       }
@@ -430,6 +428,11 @@ export function AddRecipe() {
           return;
         }
 
+        await analytics().logEvent('recipe_updated', {
+          title: title.trim(),
+          has_image: !!imageUrlString,
+        });
+
 
       } else {
         // Create new recipe
@@ -456,7 +459,10 @@ export function AddRecipe() {
           return;
         }
 
-
+        await analytics().logEvent('recipe_created', {
+          title: title.trim(),
+          has_image: !!imageUrlString,
+        });
       }
 
       router.back();

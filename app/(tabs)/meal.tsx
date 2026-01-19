@@ -10,6 +10,7 @@ import Toast from 'react-native-toast-message';
 import { RecipeSelector } from '../../components/RecipeSelector';
 import { Recipe } from '../../types/recipe';
 import { useRouter } from 'expo-router';
+import analytics from '@react-native-firebase/analytics';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const LABEL_WIDTH = 50;
@@ -104,9 +105,13 @@ export default function MealScreen() {
         custom_text: customText.trim(),
       });
       if (error) throw error;
-      Toast.show({ type: 'success', text1: '추가됨' });
+      // Toast.show({ type: 'success', text1: '추가됨' });
       setEntryModalVisible(false);
       fetchMealPlans();
+      await analytics().logEvent('menu_added', {
+        type: 'custom',
+        text: customText.trim(),
+      });
     } catch (error) {
       console.error(error);
       Toast.show({ type: 'error', text1: '저장 실패' });
@@ -122,7 +127,7 @@ export default function MealScreen() {
     try {
       const { error } = await supabase.from('meal_plans').delete().eq('id', id);
       if (error) throw error;
-      Toast.show({ type: 'success', text1: '삭제되었습니다' });
+      // Toast.show({ type: 'success', text1: '삭제되었습니다' });
       fetchMealPlans();
     } catch (error) {
       console.error('Error deleting meal:', error);
@@ -273,9 +278,14 @@ export default function MealScreen() {
                 recipe_id: recipe.id,
               });
               if (error) throw error;
-              Toast.show({ type: 'success', text1: '추가됨' });
+              // Toast.show({ type: 'success', text1: '추가됨' });
               setModalVisible(false);
               fetchMealPlans();
+              await analytics().logEvent('menu_added', {
+                type: 'recipe',
+                recipe_title: recipe.title,
+                recipe_id: recipe.id,
+              });
             } catch (error) {
               console.error(error);
             } finally {

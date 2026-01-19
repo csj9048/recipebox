@@ -9,6 +9,7 @@ import { supabase } from '../utils/supabase/client';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { AddToMealModal } from './AddToMealModal';
+import analytics from '@react-native-firebase/analytics';
 
 interface RecipeDetailProps {
   recipe: Recipe;
@@ -46,6 +47,14 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
         type: 'success',
         text1: '식단에 추가되었습니다',
       });
+
+      await analytics().logEvent('menu_added', {
+        type: 'recipe',
+        recipe_title: recipe.title,
+        recipe_id: recipe.id,
+        from: 'detail'
+      });
+
       setAddToMealModalVisible(false);
     } catch (error) {
       console.error('Error adding to meal plan:', error);
@@ -92,10 +101,6 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
               try {
                 const { error } = await supabase.from('recipes').delete().eq('id', recipe.id);
                 if (error) throw error;
-                Toast.show({
-                  type: 'success',
-                  text1: '레시피가 삭제되었습니다',
-                });
                 router.back();
               } catch (err) {
                 console.error(err);
@@ -270,6 +275,11 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
                                   });
                                   if (error) throw error;
                                   Toast.show({ type: 'success', text1: '장보기 목록에 추가되었습니다' });
+
+                                  await analytics().logEvent('shopping_added', {
+                                    item: tag.name,
+                                    method: 'recipe_tag'
+                                  });
                                 } catch (e) {
                                   console.error(e);
                                   Toast.show({ type: 'error', text1: '추가 실패' });

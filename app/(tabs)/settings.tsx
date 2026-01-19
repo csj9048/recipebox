@@ -22,85 +22,16 @@ export default function SettingsScreen() {
     useEffect(() => {
         checkUser();
         const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log('Auth event:', event);
+            console.log('Settings: Auth event:', event);
             setUser(session?.user || null);
             setImageError(false);
 
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                setAuthModalVisible(false);
-                if (session?.user) {
-                    syncGuestData(session.user.id);
-                }
-            }
+            // Global AuthModal in _layout.tsx handles sync logic now.
         });
         return () => {
             authListener.subscription.unsubscribe();
         };
     }, []);
-
-    const uploadLocalImage = async (uri: string) => {
-        try {
-            const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
-            const fileName = `sync_${Date.now()}_${Math.random().toString(36).substr(2, 5)}.jpg`;
-            const response = await fetch(`https://${projectId}.supabase.co/functions/v1/server/upload-image`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${publicAnonKey}` },
-                body: JSON.stringify({ fileBase64: `data:image/jpeg;base64,${base64}`, fileName, fileType: 'image/jpeg' }),
-            });
-            if (!response.ok) return null;
-            const { publicUrl } = await response.json();
-            return publicUrl;
-        } catch (e) { console.error('Upload failed', e); return null; }
-    };
-
-    const syncGuestData = async (userId: string) => {
-        const guestRecipes = await getGuestRecipes();
-        if (guestRecipes.length === 0) return;
-
-        Toast.show({ type: 'info', text1: '기존 레시피를 동기화하고 있습니다...' });
-
-        try {
-            for (const recipe of guestRecipes) {
-                let thumbnailUrl = recipe.thumbnail_url;
-                if (thumbnailUrl && thumbnailUrl.startsWith('file')) {
-                    const uploaded = await uploadLocalImage(thumbnailUrl);
-                    if (uploaded) thumbnailUrl = uploaded;
-                }
-
-                let imageUrl = recipe.image_url;
-                if (imageUrl) {
-                    try {
-                        const uris = JSON.parse(imageUrl);
-                        const newUris = [];
-                        for (const uri of uris) {
-                            if (uri.startsWith('file')) {
-                                const uploaded = await uploadLocalImage(uri);
-                                newUris.push(uploaded || uri);
-                            } else {
-                                newUris.push(uri);
-                            }
-                        }
-                        imageUrl = JSON.stringify(newUris);
-                    } catch (e) { }
-                }
-
-                await supabase.from('recipes').insert([{
-                    user_id: userId,
-                    title: recipe.title,
-                    body_text: recipe.body_text,
-                    memo: recipe.memo,
-                    tags: recipe.tags,
-                    thumbnail_url: thumbnailUrl,
-                    image_url: imageUrl
-                }]);
-            }
-            await clearGuestRecipes();
-            Toast.show({ type: 'success', text1: '계정에 안전하게 저장되었습니다.' });
-        } catch (e) {
-            console.error('Sync failed', e);
-            Toast.show({ type: 'error', text1: '동기화 중 오류가 발생했습니다' });
-        }
-    };
 
     const checkUser = async () => {
         const { data: { session } } = await supabase.auth.getSession();

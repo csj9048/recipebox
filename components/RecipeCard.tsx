@@ -15,14 +15,13 @@ interface RecipeCardProps {
 export function RecipeCard({ recipe, onDelete, onView, onEdit }: RecipeCardProps) {
   const situationTags = recipe.tags.filter(t => t.type === 'situation');
   const ingredientTags = recipe.tags.filter(t => t.type === 'ingredient');
-  
-  const hasValidThumbnail = recipe.thumbnail_url && 
+
+  const hasValidThumbnail = recipe.thumbnail_url &&
     recipe.thumbnail_url.trim() !== '' &&
-    recipe.thumbnail_url !== 'null' &&
-    recipe.thumbnail_url.startsWith('http');
+    recipe.thumbnail_url !== 'null';
 
   return (
-    <Pressable 
+    <Pressable
       style={styles.card}
       onPress={() => onView(recipe)}
       android_ripple={{ color: Colors.gray[100] }}
@@ -66,7 +65,7 @@ export function RecipeCard({ recipe, onDelete, onView, onEdit }: RecipeCardProps
               </TouchableOpacity>
             </View>
           </View>
-          
+
           {/* Tags */}
           <View style={styles.tagsContainer}>
             {ingredientTags.length > 0 && (
@@ -81,7 +80,7 @@ export function RecipeCard({ recipe, onDelete, onView, onEdit }: RecipeCardProps
                 )}
               </View>
             )}
-            
+
             {situationTags.length > 0 && (
               <View style={styles.tagRow}>
                 {situationTags.slice(0, 4).map((tag, idx) => (
