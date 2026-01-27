@@ -10,47 +10,22 @@ import { AuthModal } from '../components/AuthModal';
 import { getGuestRecipes } from '../utils/storage';
 import { useState } from 'react';
 
+import { useFonts } from 'expo-font';
+import { Ionicons } from '@expo/vector-icons';
+import * as SplashScreen from 'expo-splash-screen';
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
   const [authModalVisible, setAuthModalVisible] = useState(false);
+  const [loaded, error] = useFonts({
+    ...Ionicons.font,
+  });
 
   useEffect(() => {
-    // Global Auth Listener for Sync
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Trigger sync if we just signed in OR if we are initialized with a session
-      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
-        const guestRecipes = await getGuestRecipes();
-        if (guestRecipes.length > 0) {
-          console.log('RootLayout: Found guest recipes, opening sync modal...');
-          setAuthModalVisible(true);
-        }
-
-        // Log login event
-        if (event === 'SIGNED_IN') {
-          await analytics().logLogin({
-            method: session.user.app_metadata.provider || 'email'
-          });
-        }
-      }
-    });
-
-    // Handle deep link when app is cold-launched
-    Linking.getInitialURL().then((url) => {
-      if (url) {
-        handleDeepLink(url);
-      }
-    });
-
-    // Handle deep link while app is running
-    const subscription = Linking.addEventListener('url', ({ url }) => {
-      console.log('Incoming URL:', url);
-      handleDeepLink(url);
-    });
-
-    return () => {
-      subscription.remove();
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+    if (error) throw error;
+  }, [error]);
 
   const handleDeepLink = async (url: string) => {
     try {
@@ -104,6 +79,57 @@ export default function RootLayout() {
       console.error('Deep link handling error:', e);
     }
   };
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  useEffect(() => {
+    // Global Auth Listener for Sync
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Trigger sync if we just signed in OR if we are initialized with a session
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+        const guestRecipes = await getGuestRecipes();
+        if (guestRecipes.length > 0) {
+          console.log('RootLayout: Found guest recipes, opening sync modal...');
+          setAuthModalVisible(true);
+        }
+
+        // Log login event
+        if (event === 'SIGNED_IN') {
+          await analytics().logLogin({
+            method: session.user.app_metadata.provider || 'email'
+          });
+        }
+      }
+    });
+
+    // Handle deep link when app is cold-launched
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink(url);
+      }
+    });
+
+    // Handle deep link while app is running
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      console.log('Incoming URL:', url);
+      handleDeepLink(url);
+    });
+
+    return () => {
+      subscription.remove();
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (!loaded) {
+    return null;
+  }
+
+
 
   return (
     <>

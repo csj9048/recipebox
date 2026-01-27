@@ -17,8 +17,8 @@ export interface RecipeInsert {
   body_text?: string;
   memo?: string;
   tags?: { type: 'situation' | 'ingredient'; name: string }[];
-  thumbnail_url?: string;
-  image_url?: string;
+  thumbnail_url?: string | null;
+  image_url?: string | null;
 }
 
 export interface RecipeUpdate {
@@ -26,7 +26,7 @@ export interface RecipeUpdate {
   body_text?: string;
   memo?: string;
   tags?: { type: 'situation' | 'ingredient'; name: string }[];
-  thumbnail_url?: string;
-  image_url?: string;
+  thumbnail_url?: string | null;
+  image_url?: string | null;
 }
 

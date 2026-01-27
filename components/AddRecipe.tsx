@@ -410,8 +410,8 @@ export function AddRecipe() {
           body_text: bodyText.trim(),
           memo,
           tags,
-          thumbnail_url: thumbnailUrl ?? undefined,
-          image_url: imageUrlString ?? undefined,
+          thumbnail_url: thumbnailUrl,
+          image_url: imageUrlString,
         };
 
         const { error } = await supabase

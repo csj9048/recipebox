@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal, TextInput, TouchableOpacity, ActivityIndicator, Alert, Linking, AppState } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Modal, TextInput, TouchableOpacity, ActivityIndicator, Alert, Linking, AppState, Platform } from 'react-native';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import * as ExpoLinking from 'expo-linking';
 import { Colors } from '../constants/Colors';
 import { supabase } from '../utils/supabase/client';
@@ -24,6 +25,11 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [guestRecipeCount, setGuestRecipeCount] = useState(0);
+    const [appleAuthAvailable, setAppleAuthAvailable] = useState(false);
+
+    useEffect(() => {
+        AppleAuthentication.isAvailableAsync().then(setAppleAuthAvailable);
+    }, []);
 
     // Reset form when modal opens
     React.useEffect(() => {
@@ -162,6 +168,60 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
             Alert.alert('오류', msg);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const onAppleLogin = async () => {
+        try {
+            const credential = await AppleAuthentication.signInAsync({
+                requestedScopes: [
+                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                ],
+            });
+
+            console.log('Apple Credential:', credential);
+
+            if (credential.identityToken) {
+                let extraData = {};
+                if (credential.fullName) {
+                    const nameParts = [];
+                    if (credential.fullName.familyName) nameParts.push(credential.fullName.familyName);
+                    if (credential.fullName.givenName) nameParts.push(credential.fullName.givenName);
+                    const fullName = nameParts.join(' ');
+                    if (fullName) {
+                        extraData = {
+                            data: {
+                                full_name: fullName,
+                                name: fullName, // Supabase often uses 'name' as well
+                            }
+                        };
+                    }
+                }
+
+                const { error } = await supabase.auth.signInWithIdToken({
+                    provider: 'apple',
+                    token: credential.identityToken,
+                    options: extraData // Attach user metadata handles the update on sign-in
+                });
+
+                if (error) {
+                    console.error('Supabase Apple Sign-In Error:', error);
+                    Alert.alert('로그인 실패', error.message);
+                } else {
+                    // onSuccess will be triggered by onAuthStateChange in RootLayout
+                    onSuccess?.();
+                }
+            } else {
+                throw new Error('No identityToken.');
+            }
+        } catch (e: any) {
+            if (e.code === 'ERR_REQUEST_CANCELED') {
+                // user canceled
+            } else {
+                console.error('Apple Login Error:', e);
+                Alert.alert('로그인 오류', 'Apple 로그인 중 문제가 발생했습니다.');
+            }
         }
     };
 
@@ -387,6 +447,16 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                     </Text>
                                 </TouchableOpacity>
 
+                                {appleAuthAvailable && (
+                                    <AppleAuthentication.AppleAuthenticationButton
+                                        buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                                        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                                        cornerRadius={12}
+                                        style={styles.appleButton}
+                                        onPress={onAppleLogin}
+                                    />
+                                )}
+
                                 <TouchableOpacity
                                     style={styles.switchButton}
                                     onPress={() => setIsLogin(!isLogin)}
@@ -404,7 +474,6 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                                 Alert.alert('알림', '이메일을 입력해주세요.');
                                                 return;
                                             }
-                                            // ... (Keeping existing reset logic simplified for brevity if unchanged, but actually I need to preserve it)
                                             Alert.alert('비밀번호 재설정', '기능 준비중입니다.');
                                         }}
                                     >
@@ -452,7 +521,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                     )}
                 </View>
             </View>
-        </Modal>
+        </Modal >
     );
 }
 
@@ -517,6 +586,11 @@ const styles = StyleSheet.create({
     socialButtonText: {
         fontSize: 16,
         fontWeight: '600',
+    },
+    appleButton: {
+        width: '100%',
+        height: 50,
+        marginBottom: 8,
     },
     switchButton: {
         alignItems: 'center',

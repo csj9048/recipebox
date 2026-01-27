@@ -155,10 +155,12 @@ export default function SettingsScreen() {
                             )}
                             <View>
                                 <Text style={styles.emailText}>
-                                    {user.user_metadata?.full_name || user.user_metadata?.name || user.email || '사용자'}님
+                                    {user.user_metadata?.full_name || user.user_metadata?.name || (user.email && user.email.includes('privaterelay') ? 'Apple 사용자' : user.email) || '사용자'}님
                                 </Text>
                                 <Text style={styles.loginStatusText}>
-                                    {user.email && !user.email.includes('@recipebox') ? user.email : '로그인됨'}
+                                    {user.app_metadata?.provider === 'kakao' ? '카카오 로그인됨' :
+                                        user.app_metadata?.provider === 'apple' ? 'Apple 로그인됨' :
+                                            (user.email && !user.email.includes('@recipebox') ? user.email : '로그인됨')}
                                 </Text>
                             </View>
                         </View>
