@@ -3,6 +3,7 @@ import { usePathname, useRouter, Slot } from 'expo-router';
 import { Colors } from '../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AdBanner } from '../../components/AdBanner';
 
 export default function TabsLayout() {
   const pathname = usePathname();
@@ -12,6 +13,7 @@ export default function TabsLayout() {
   const tabs = [
     { name: '레시피', route: '/', icon: 'restaurant' },
     { name: '식단', route: '/meal', icon: 'calendar' },
+    { name: '', route: '/add', icon: 'add-circle' },
     { name: '장보기', route: '/shopping', icon: 'cart' },
     { name: '설정', route: '/settings', icon: 'settings' },
   ];
@@ -21,6 +23,7 @@ export default function TabsLayout() {
       <View style={styles.content}>
         <Slot />
       </View>
+      <AdBanner />
       <View style={[styles.tabBar, { paddingBottom: insets.bottom, height: 60 + insets.bottom }]}>
         {tabs.map((tab) => {
           const isActive = pathname === tab.route;
@@ -32,17 +35,20 @@ export default function TabsLayout() {
             >
               <Ionicons
                 name={tab.icon as any}
-                size={24}
-                color={isActive ? Colors.primary : Colors.gray[400]}
+                size={tab.route === '/add' ? 48 : 24}
+                color={tab.route === '/add' ? Colors.primary : (isActive ? Colors.primary : Colors.gray[400])}
+                style={tab.route === '/add' ? { marginTop: -20 } : undefined}
               />
-              <Text
-                style={[
-                  styles.tabLabel,
-                  isActive && styles.tabLabelActive,
-                ]}
-              >
-                {tab.name}
-              </Text>
+              {tab.name ? (
+                <Text
+                  style={[
+                    styles.tabLabel,
+                    isActive && styles.tabLabelActive,
+                  ]}
+                >
+                  {tab.name}
+                </Text>
+              ) : null}
             </TouchableOpacity>
           );
         })}

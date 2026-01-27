@@ -46,7 +46,14 @@
           }
         }
       ],
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8570807371650587~7298062471",
+          "iosAppId": "ca-app-pub-8570807371650587~6911049667"
+        }
+      ]
     ]
   }
 }
