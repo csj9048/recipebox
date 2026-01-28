@@ -62,7 +62,7 @@ export default function RootLayout() {
           appOpenAd.load();
 
           // Wait for ad to load or timeout (timeout 2.5s)
-          const timeoutPromise = new Promise(resolve => setTimeout(resolve, 2500, 'TIMEOUT'));
+          const timeoutPromise = new Promise(resolve => setTimeout(resolve, 1500, 'TIMEOUT'));
 
           const adPromise = new Promise(resolve => {
             const unsubscribeLoaded = appOpenAd.addAdEventListener(AdEventType.LOADED, () => {
