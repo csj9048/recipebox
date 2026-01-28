@@ -35,9 +35,8 @@ export default function TabsLayout() {
             >
               <Ionicons
                 name={tab.icon as any}
-                size={tab.route === '/add' ? 48 : 24}
+                size={tab.route === '/add' ? 50 : 24}
                 color={tab.route === '/add' ? Colors.primary : (isActive ? Colors.primary : Colors.gray[400])}
-                style={tab.route === '/add' ? { marginTop: -20 } : undefined}
               />
               {tab.name ? (
                 <Text

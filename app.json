@@ -53,6 +53,12 @@
           "androidAppId": "ca-app-pub-8570807371650587~7298062471",
           "iosAppId": "ca-app-pub-8570807371650587~6911049667"
         }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "이 앱은 사용자에게 딱 맞는 레시피와 광고를 제공하기 위해 활동을 추적합니다."
+        }
       ]
     ]
   }
