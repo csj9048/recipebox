@@ -18,7 +18,8 @@
       "bundleIdentifier": "com.recipebox.app.ios",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSUserTrackingUsageDescription": "사용자의 앱 사용 패턴을 분석하여 더 나은 서비스를 제공하기 위해 사용됩니다."
       }
     },
     "android": {
