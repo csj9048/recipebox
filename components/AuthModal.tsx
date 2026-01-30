@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TextInput, TouchableOpacity, ActivityIndicator, Alert, Linking, AppState, Platform } from 'react-native';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as ExpoLinking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
 import { Colors } from '../constants/Colors';
 import { supabase } from '../utils/supabase/client';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +18,8 @@ interface AuthModalProps {
     onSuccess: () => void;
     initialViewMode?: 'auth' | 'sync';
 }
+
+WebBrowser.maybeCompleteAuthSession();
 
 export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth' }: AuthModalProps) {
     const [viewMode, setViewMode] = useState<'auth' | 'sync'>(initialViewMode);
@@ -61,6 +64,8 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
         const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN' && session) {
                 console.log('AuthModal: User signed in (event), checking guest recipes...');
+                // Avoid double processing if already handled manually
+                if (loading) return;
                 await checkGuestRecipes(session.user.id);
             }
         });
@@ -85,6 +90,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
         });
 
         return () => {
+            console.log('AuthModal: Cleaning up listeners');
             authListener.subscription.unsubscribe();
             appStateSubscription.remove();
         };
@@ -98,9 +104,12 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                 setGuestRecipeCount(recipes.length);
                 setViewMode('sync');
             } else {
-                console.log('No guest recipes. Closing.');
-                onSuccess();
-                onClose();
+                console.log('No guest recipes. Closing in 500ms...');
+                // Add a small delay to ensure WebBrowser/Modal transitions settle
+                setTimeout(() => {
+                    onSuccess();
+                    onClose();
+                }, 500);
             }
         } catch (e) {
             console.error('Failed to check guest recipes', e);
@@ -228,10 +237,13 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
     const handleKakaoLogin = async () => {
         setLoading(true);
         try {
+            // 1. Get the OAuth URL from Supabase
+            // skipBrowserRedirect is crucial so Supabase doesn't try to open headers itself
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'kakao',
                 options: {
                     redirectTo: 'recipebox://',
+                    skipBrowserRedirect: true,
                     queryParams: {
                         scope: 'profile_nickname,profile_image',
                     },
@@ -239,12 +251,46 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
             });
 
             if (error) throw error;
+
             if (data?.url) {
-                await Linking.openURL(data.url);
+                // 2. Open the URL in an In-App Browser (ASWebAuthenticationSession)
+                // The browser will automatically close when it detects a redirect to 'recipebox://'
+                const result = await WebBrowser.openAuthSessionAsync(
+                    data.url,
+                    'recipebox://'
+                );
+
+                // 3. Handle the result
+                if (result.type === 'success' && result.url) {
+                    console.log('WebBrowser success:', result.url);
+
+                    // Manually parse the URL fragment to extract tokens
+                    try {
+                        // iOS might return the URL with #access_token=...
+                        const urlObj = new URL(result.url);
+                        const params = new URLSearchParams(urlObj.hash.replace('#', ''));
+                        const accessToken = params.get('access_token');
+                        const refreshToken = params.get('refresh_token');
+
+                        if (accessToken && refreshToken) {
+                            const { error } = await supabase.auth.setSession({
+                                access_token: accessToken,
+                                refresh_token: refreshToken,
+                            });
+                            if (error) throw error;
+                            console.log('Session manually set from WebBrowser result');
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse session from URL:', e);
+                    }
+                } else if (result.type === 'cancel' || result.type === 'dismiss') {
+                    console.log('User cancelled login');
+                }
             }
         } catch (error: any) {
-            console.error(error);
-            Alert.alert('Kakao Login Error', error.message);
+            console.error('Kakao login error:', error);
+            Alert.alert('로그인 오류', error.message || '카카오 로그인 중 문제가 발생했습니다.');
+        } finally {
             setLoading(false);
         }
     };
