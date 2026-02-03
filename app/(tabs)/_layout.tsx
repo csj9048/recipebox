@@ -24,7 +24,7 @@ export default function TabsLayout() {
         <Slot />
       </View>
       <AdBanner />
-      <View style={[styles.tabBar, { paddingBottom: insets.bottom, height: 60 + insets.bottom }]}>
+      <View style={[styles.tabBar, { paddingBottom: insets.bottom, height: 70 + insets.bottom }]}>
         {tabs.map((tab) => {
           const isActive = pathname === tab.route;
           return (
@@ -68,9 +68,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.border.light,
     backgroundColor: Colors.white,
-    height: 60,
-    paddingBottom: 8,
-    paddingTop: 8,
+    height: 70,
+    paddingTop: 0,
   },
   tab: {
     flex: 1,

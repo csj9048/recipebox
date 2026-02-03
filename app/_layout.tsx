@@ -61,8 +61,8 @@ export default function RootLayout() {
           // Subsequent Launch Logic: Load App Open Ad
           appOpenAd.load();
 
-          // Wait for ad to load or timeout (timeout 2.5s)
-          const timeoutPromise = new Promise(resolve => setTimeout(resolve, 1500, 'TIMEOUT'));
+          // Wait for ad to load or timeout (timeout 1.0s)
+          const timeoutPromise = new Promise(resolve => setTimeout(resolve, 1000, 'TIMEOUT'));
 
           const adPromise = new Promise(resolve => {
             const unsubscribeLoaded = appOpenAd.addAdEventListener(AdEventType.LOADED, () => {
@@ -142,6 +142,14 @@ export default function RootLayout() {
   };
 
   useEffect(() => {
+    // Check for valid session on startup to prevent "Invalid Refresh Token" crash
+    supabase.auth.getSession().then(({ error }) => {
+      if (error && (error.message.includes('Refresh Token') || error.message.includes('refresh_token'))) {
+        console.log('Detected invalid refresh token, signing out...');
+        supabase.auth.signOut();
+      }
+    });
+
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
         const guestRecipes = await getGuestRecipes();
@@ -149,6 +157,8 @@ export default function RootLayout() {
         if (event === 'SIGNED_IN') {
           await analytics().logLogin({ method: session.user.app_metadata.provider || 'email' });
         }
+      } else if (event === 'SIGNED_OUT') {
+        // Ensure UI updates if needed
       }
     });
     Linking.getInitialURL().then((url) => { if (url) handleDeepLink(url); });

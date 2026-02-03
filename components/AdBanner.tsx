@@ -11,8 +11,8 @@ type AdBannerProps = {
 const adUnitId = __DEV__
     ? TestIds.BANNER
     : Platform.select({
-        ios: 'ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx', // Replace with your iOS Ad Unit ID
-        android: 'ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx', // Replace with your Android Ad Unit ID
+        ios: 'ca-app-pub-8570807371650587/4006283556', // Replace with your iOS Ad Unit ID
+        android: 'ca-app-pub-8570807371650587/3420921861', // Real Android Ad Unit ID
     }) || TestIds.BANNER;
 
 export function AdBanner({ style }: AdBannerProps) {

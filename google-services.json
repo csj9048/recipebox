@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "189700867975",
+    "project_id": "recipebox-c1ba0",
+    "storage_bucket": "recipebox-c1ba0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:189700867975:android:44589ab7f0e37dcefdb522",
+        "android_client_info": {
+          "package_name": "com.recipebox.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEo2KocwvLhtjWCE4kTWgMCM_-0TSvv4k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
