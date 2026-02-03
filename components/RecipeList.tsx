@@ -182,21 +182,7 @@ export function RecipeList() {
         />
       )}
 
-      {/* FAB */}
-      <View style={styles.fabContainer}>
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={() => {
-            router.push('/add');
-          }}
-        >
-          <Ionicons
-            name="add"
-            size={28}
-            color={Colors.text.primary}
-          />
-        </TouchableOpacity>
-      </View>
+
     </View>
   );
 }
@@ -280,24 +266,6 @@ const styles = StyleSheet.create({
     color: Colors.gray[400],
     textAlign: 'center',
   },
-  fabContainer: {
-    position: 'absolute',
-    bottom: 24, // Adjusted for tab bar
-    left: '50%',
-    transform: [{ translateX: -28 }], // Half of width (56/2)
-  },
-  fab: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
+
 });
 

@@ -3,6 +3,7 @@ import { Recipe } from '../types/recipe';
 import * as FileSystem from 'expo-file-system';
 
 const GUEST_RECIPES_KEY = 'guest_recipes';
+const FIRST_LAUNCH_KEY = 'is_first_launch';
 
 // Helper to make paths relative
 const makeRelative = (path: string | null): string | null => {
@@ -23,7 +24,7 @@ const makeAbsolute = (path: string | null): string | null => {
     return path;
 };
 
-// Process recipe for saving (Relative Paths)
+// Process recipe for save (Relative Paths)
 const processForSave = (recipe: Recipe): Recipe => {
     const relativeThumb = makeRelative(recipe.thumbnail_url ?? null);
 
@@ -36,7 +37,6 @@ const processForSave = (recipe: Recipe): Recipe => {
                 relativeImages = JSON.stringify(updated);
             }
         } catch {
-            // If not array, try single path
             const rel = makeRelative(recipe.image_url);
             if (rel) relativeImages = rel;
         }
@@ -49,7 +49,7 @@ const processForSave = (recipe: Recipe): Recipe => {
     };
 };
 
-// Process recipe for loading (Absolute Paths)
+// Process recipe for load (Absolute Paths)
 const processForLoad = (recipe: Recipe): Recipe => {
     const absoluteThumb = makeAbsolute(recipe.thumbnail_url ?? null);
 
@@ -90,7 +90,6 @@ export const saveGuestRecipe = async (recipe: Recipe): Promise<void> => {
         const currentRecipesRaw = await AsyncStorage.getItem(GUEST_RECIPES_KEY);
         const currentRecipes = currentRecipesRaw ? JSON.parse(currentRecipesRaw) : [];
 
-        // Save the new recipe with relative paths
         const optimizedRecipe = processForSave(recipe);
         const updatedRecipes = [optimizedRecipe, ...currentRecipes];
 
@@ -119,7 +118,6 @@ export const updateGuestRecipe = async (recipe: Recipe): Promise<void> => {
 
 export const deleteGuestRecipe = async (id: string): Promise<void> => {
     try {
-        // Get RAW, filter RAW, save RAW to avoid unnecessary path processing
         const currentRecipesRaw = await AsyncStorage.getItem(GUEST_RECIPES_KEY);
         const currentRecipes: Recipe[] = currentRecipesRaw ? JSON.parse(currentRecipesRaw) : [];
         const updatedRecipes = currentRecipes.filter((r) => r.id !== id);
@@ -136,5 +134,29 @@ export const clearGuestRecipes = async (): Promise<void> => {
     } catch (e) {
         console.error('Failed to clear guest recipes', e);
         throw e;
+    }
+};
+
+// --- First Launch Check ---
+
+export const getIsFirstLaunch = async (): Promise<boolean> => {
+    try {
+        const value = await AsyncStorage.getItem(FIRST_LAUNCH_KEY);
+        return value === null; // If null, it's the first launch
+    } catch (e) {
+        console.error('Failed to check first launch', e);
+        return false; // Default to false on error to be safe
+    }
+};
+
+export const setIsFirstLaunch = async (isFirst: boolean): Promise<void> => {
+    try {
+        if (isFirst) {
+            await AsyncStorage.removeItem(FIRST_LAUNCH_KEY);
+        } else {
+            await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'false');
+        }
+    } catch (e) {
+        console.error('Failed to set first launch', e);
     }
 };

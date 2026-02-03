@@ -10,7 +10,7 @@
     "scheme": "recipebox",
     "splash": {
       "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#FBBB02"
     },
     "ios": {
@@ -23,13 +23,18 @@
       }
     },
     "android": {
+      "splash": {
+        "image": "./assets/adaptive-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#FBBB02"
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FBBB02"
       },
       "package": "com.recipebox.app",
       "versionCode": 3,
-      "googleServicesFile": "./android/app/google-services.json"
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -44,10 +49,26 @@
         {
           "ios": {
             "useFrameworks": "static"
+          },
+          "android": {
+            "kotlinVersion": "1.9.25"
           }
         }
       ],
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8570807371650587~7298062471",
+          "iosAppId": "ca-app-pub-8570807371650587~6911049667"
+        }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "이 앱은 사용자에게 딱 맞는 레시피와 광고를 제공하기 위해 활동을 추적합니다."
+        }
+      ]
     ]
   }
 }

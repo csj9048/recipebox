@@ -2,6 +2,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { RecipeDetail } from '../../components/RecipeDetail';
+import { AdBanner } from '../../components/AdBanner';
 import { Recipe } from '../../types/recipe';
 import { getGuestRecipes } from '../../utils/storage';
 import { supabase } from '../../utils/supabase/client';
@@ -83,7 +84,12 @@ export default function RecipeDetailScreen() {
     );
   }
 
-  return <RecipeDetail recipe={recipe} />;
+  return (
+    <View style={{ flex: 1 }}>
+      <RecipeDetail recipe={recipe} />
+      <AdBanner />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
