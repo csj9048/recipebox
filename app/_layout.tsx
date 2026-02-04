@@ -13,7 +13,7 @@ import { getGuestRecipes, getIsFirstLaunch, setIsFirstLaunch } from '../utils/st
 import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import * as SplashScreen from 'expo-splash-screen';
-import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
+import { requestTrackingPermissionsAsync, getTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { AppOpenAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -45,24 +45,33 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepare() {
       try {
-        // 1. Check First Launch
-        const isFirstLaunch = await getIsFirstLaunch();
-
-        if (isFirstLaunch) {
-          // First Launch Logic: No Ad, Request ATT (iOS)
-          if (Platform.OS === 'ios') {
+        // 1. Check & Request ATT (iOS) - Ensure this runs if permission is undetermined, regardless of first launch
+        if (Platform.OS === 'ios') {
+          const { status: existingStatus } = await getTrackingPermissionsAsync();
+          if (existingStatus === 'undetermined') {
             await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for splash
             const { status } = await requestTrackingPermissionsAsync();
             console.log('ATT Permission Status:', status);
           }
+        }
+
+        // 2. Check First Launch
+        const isFirstLaunch = await getIsFirstLaunch();
+
+        if (isFirstLaunch) {
+          // First Launch Logic: No Ad (just set flag and ready)
           await setIsFirstLaunch(false);
           setAppIsReady(true);
         } else {
           // Subsequent Launch Logic: Load App Open Ad
           appOpenAd.load();
 
-          // Wait for ad to load or timeout (timeout 1.0s)
-          const timeoutPromise = new Promise(resolve => setTimeout(resolve, 1000, 'TIMEOUT'));
+          // Wait for ad to load or timeout (timeout 3.0s)
+          const timeoutPromise = new Promise(resolve => setTimeout(() => {
+            console.log('Ad Timed Out');
+            // Toast.show({ type: 'error', text1: 'Debug: Ad Timed Out' }); // Uncomment for debug
+            resolve('TIMEOUT');
+          }, 3000));
 
           const adPromise = new Promise(resolve => {
             const unsubscribeLoaded = appOpenAd.addAdEventListener(AdEventType.LOADED, () => {
@@ -70,6 +79,7 @@ export default function RootLayout() {
             });
             const unsubscribeError = appOpenAd.addAdEventListener(AdEventType.ERROR, (error) => {
               console.log('App Open Ad Error:', error);
+              // Toast.show({ type: 'error', text1: 'Debug: Ad Error', text2: error.message }); // Uncomment for debug
               resolve('ERROR');
             });
           });
