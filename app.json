@@ -33,7 +33,7 @@
         "backgroundColor": "#FBBB02"
       },
       "package": "com.recipebox.app",
-      "versionCode": 9,
+      "versionCode": 13,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
