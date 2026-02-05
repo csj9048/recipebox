@@ -33,7 +33,7 @@
         "backgroundColor": "#FBBB02"
       },
       "package": "com.recipebox.app",
-      "versionCode": 4,
+      "versionCode": 6,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -51,7 +51,9 @@
             "useFrameworks": "static"
           },
           "android": {
-            "kotlinVersion": "1.9.25"
+            "kotlinVersion": "1.9.25",
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35
           }
         }
       ],
