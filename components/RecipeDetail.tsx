@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { AddToMealModal } from './AddToMealModal';
 import analytics from '@react-native-firebase/analytics';
+import { addGuestMealPlan, addGuestShoppingItem } from '../utils/storage';
 
 interface RecipeDetailProps {
   recipe: Recipe;
@@ -30,18 +31,24 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
   const handleAddToMealPlan = async (date: Date, mealType: 'breakfast' | 'lunch' | 'dinner') => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('로그인이 필요합니다');
-
       const dateStr = date.toISOString().split('T')[0];
 
-      const { error } = await supabase.from('meal_plans').insert({
-        user_id: user.id,
-        date: dateStr,
-        meal_type: mealType,
-        recipe_id: recipe.id,
-      });
-
-      if (error) throw error;
+      if (!user) {
+        // Guest mode
+        await addGuestMealPlan({
+          date: dateStr,
+          meal_type: mealType,
+          recipe_id: recipe.id,
+        });
+      } else {
+        const { error } = await supabase.from('meal_plans').insert({
+          user_id: user.id,
+          date: dateStr,
+          meal_type: mealType,
+          recipe_id: recipe.id,
+        });
+        if (error) throw error;
+      }
 
       Toast.show({
         type: 'success',
@@ -265,15 +272,18 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
                               onPress: async () => {
                                 try {
                                   const { data: { user } } = await supabase.auth.getUser();
-                                  if (!user) {
-                                    Toast.show({ type: 'error', text1: '로그인이 필요합니다' });
-                                    return;
+
+                                  if (user) {
+                                    const { error } = await supabase.from('shopping_items').insert({
+                                      user_id: user.id,
+                                      text: tag.name
+                                    });
+                                    if (error) throw error;
+                                  } else {
+                                    // Guest mode
+                                    await addGuestShoppingItem(tag.name);
                                   }
-                                  const { error } = await supabase.from('shopping_items').insert({
-                                    user_id: user.id,
-                                    text: tag.name
-                                  });
-                                  if (error) throw error;
+
                                   Toast.show({ type: 'success', text1: '장보기 목록에 추가되었습니다' });
 
                                   await analytics().logEvent('shopping_added', {

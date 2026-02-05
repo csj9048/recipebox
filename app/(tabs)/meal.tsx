@@ -11,6 +11,7 @@ import { RecipeSelector } from '../../components/RecipeSelector';
 import { Recipe } from '../../types/recipe';
 import { useRouter } from 'expo-router';
 import analytics from '@react-native-firebase/analytics';
+import { getGuestMealPlans, addGuestMealPlan, deleteGuestMealPlan } from '../../utils/storage';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const LABEL_WIDTH = 50;
@@ -52,12 +53,18 @@ export default function MealScreen() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const user = session?.user;
-      if (!user) {
-        setLoading(false);
-        return;
-      }
       const startDate = format(viewingWeekStart, 'yyyy-MM-dd');
       const endDate = format(addDays(viewingWeekStart, 6), 'yyyy-MM-dd');
+
+      if (!user) {
+        // Guest mode
+        const guestPlans = await getGuestMealPlans(startDate, endDate);
+        setMealPlans(guestPlans as any); // Type assertion needed or unification
+        setLoading(false);
+        setRefreshing(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('meal_plans')
         .select('*, recipes(id, title, thumbnail_url)')
@@ -96,15 +103,25 @@ export default function MealScreen() {
     try {
       setSaving(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('로그인이 필요합니다');
       const dateStr = format(selectedDate!, 'yyyy-MM-dd');
-      const { error } = await supabase.from('meal_plans').insert({
-        user_id: user.id,
-        date: dateStr,
-        meal_type: selectedMealType!,
-        custom_text: customText.trim(),
-      });
-      if (error) throw error;
+
+      if (!user) {
+        // Guest mode
+        await addGuestMealPlan({
+          date: dateStr,
+          meal_type: selectedMealType!,
+          custom_text: customText.trim(),
+        });
+      } else {
+        const { error } = await supabase.from('meal_plans').insert({
+          user_id: user.id,
+          date: dateStr,
+          meal_type: selectedMealType!,
+          custom_text: customText.trim(),
+        });
+        if (error) throw error;
+      }
+
       // Toast.show({ type: 'success', text1: '추가됨' });
       setEntryModalVisible(false);
       fetchMealPlans();
@@ -125,8 +142,14 @@ export default function MealScreen() {
     if (e) e.stopPropagation();
 
     try {
-      const { error } = await supabase.from('meal_plans').delete().eq('id', id);
-      if (error) throw error;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        // Guest mode
+        await deleteGuestMealPlan(id);
+      } else {
+        const { error } = await supabase.from('meal_plans').delete().eq('id', id);
+        if (error) throw error;
+      }
       // Toast.show({ type: 'success', text1: '삭제되었습니다' });
       fetchMealPlans();
     } catch (error) {
@@ -269,15 +292,25 @@ export default function MealScreen() {
             try {
               setSaving(true);
               const { data: { user } } = await supabase.auth.getUser();
-              if (!user) throw new Error('로그인이 필요합니다');
               const dateStr = format(selectedDate!, 'yyyy-MM-dd');
-              const { error } = await supabase.from('meal_plans').insert({
-                user_id: user.id,
-                date: dateStr,
-                meal_type: selectedMealType!,
-                recipe_id: recipe.id,
-              });
-              if (error) throw error;
+
+              if (!user) {
+                // Guest mode
+                await addGuestMealPlan({
+                  date: dateStr,
+                  meal_type: selectedMealType!,
+                  recipe_id: recipe.id,
+                });
+              } else {
+                const { error } = await supabase.from('meal_plans').insert({
+                  user_id: user.id,
+                  date: dateStr,
+                  meal_type: selectedMealType!,
+                  recipe_id: recipe.id,
+                });
+                if (error) throw error;
+              }
+
               // Toast.show({ type: 'success', text1: '추가됨' });
               setModalVisible(false);
               fetchMealPlans();

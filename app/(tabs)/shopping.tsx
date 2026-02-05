@@ -7,6 +7,13 @@ import { supabase } from '../../utils/supabase/client';
 import Toast from 'react-native-toast-message';
 import analytics from '@react-native-firebase/analytics';
 import { useFocusEffect } from 'expo-router';
+import {
+  getGuestShoppingList,
+  addGuestShoppingItem,
+  toggleGuestShoppingItem,
+  deleteGuestShoppingItem,
+  clearGuestShoppingList
+} from '../../utils/storage';
 
 interface ShoppingItem {
   id: string;
@@ -25,8 +32,15 @@ export default function ShoppingScreen() {
   const fetchItems = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+
       if (!user) {
+        // Guest mode
+        const guestItems = await getGuestShoppingList();
+        // Sort by created_at desc (newest first)
+        const sorted = guestItems.sort((a, b) => b.created_at - a.created_at);
+        setItems(sorted);
         setLoading(false);
+        setRefreshing(false);
         return;
       }
 
@@ -63,18 +77,21 @@ export default function ShoppingScreen() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
 
-      const { error } = await supabase
-        .from('shopping_items')
-        .insert({
-          user_id: user.id,
-          text: newItemText.trim(),
-        });
+      if (!user) {
+        // Guest mode
+        await addGuestShoppingItem(newItemText.trim());
+      } else {
+        const { error } = await supabase
+          .from('shopping_items')
+          .insert({
+            user_id: user.id,
+            text: newItemText.trim(),
+          });
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
-      setNewItemText('');
       setNewItemText('');
       fetchItems();
       await analytics().logEvent('shopping_added', {
@@ -89,12 +106,19 @@ export default function ShoppingScreen() {
 
   const handleToggleComplete = async (item: ShoppingItem) => {
     try {
-      const { error } = await supabase
-        .from('shopping_items')
-        .update({ is_completed: !item.is_completed })
-        .eq('id', item.id);
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (error) throw error;
+      if (!user) {
+        // Guest mode
+        await toggleGuestShoppingItem(item.id);
+      } else {
+        const { error } = await supabase
+          .from('shopping_items')
+          .update({ is_completed: !item.is_completed })
+          .eq('id', item.id);
+
+        if (error) throw error;
+      }
       fetchItems();
     } catch (error) {
       console.error('Error toggling item:', error);
@@ -109,8 +133,15 @@ export default function ShoppingScreen() {
         style: 'destructive',
         onPress: async () => {
           try {
-            const { error } = await supabase.from('shopping_items').delete().eq('id', id);
-            if (error) throw error;
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+              // Guest mode
+              await deleteGuestShoppingItem(id);
+            } else {
+              const { error } = await supabase.from('shopping_items').delete().eq('id', id);
+              if (error) throw error;
+            }
             fetchItems();
           } catch (error) {
             console.error('Error deleting item:', error);
@@ -132,14 +163,18 @@ export default function ShoppingScreen() {
           onPress: async () => {
             try {
               const { data: { user } } = await supabase.auth.getUser();
-              if (!user) return;
 
-              const { error } = await supabase
-                .from('shopping_items')
-                .delete()
-                .eq('user_id', user.id);
+              if (!user) {
+                // Guest mode
+                await clearGuestShoppingList();
+              } else {
+                const { error } = await supabase
+                  .from('shopping_items')
+                  .delete()
+                  .eq('user_id', user.id);
 
-              if (error) throw error;
+                if (error) throw error;
+              }
               fetchItems();
               Toast.show({ type: 'success', text1: '목록이 초기화되었습니다' });
             } catch (error) {

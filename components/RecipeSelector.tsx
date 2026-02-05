@@ -5,6 +5,7 @@ import { Colors } from '../constants/Colors';
 import { supabase } from '../utils/supabase/client';
 import { Recipe } from '../types/recipe';
 import { Image } from 'expo-image';
+import { getGuestRecipes } from '../utils/storage';
 
 interface RecipeSelectorProps {
     onSelect: (recipe: Recipe) => void;
@@ -24,7 +25,14 @@ export function RecipeSelector({ onSelect, onClose }: RecipeSelectorProps) {
         try {
             setLoading(true);
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.user) return;
+
+            if (!session?.user) {
+                // Guest mode
+                const guestRecipes = await getGuestRecipes();
+                // Sort by last modified/created (desc) - assuming id acts as timestamp or order matter
+                setRecipes(guestRecipes.reverse());
+                return;
+            }
 
             const { data, error } = await supabase
                 .from('recipes')
