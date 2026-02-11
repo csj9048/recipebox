@@ -67,7 +67,7 @@
         },
         "sync": {
             "title": "You have {{count}} recipes!",
-            "description": "Would you like to move recipes created before login\\nto your current account?",
+            "description": "Would you like to move recipes created before login to your current account?",
             "confirm": "Yes, save to account",
             "discard": "No, delete them",
             "alert_title": "Warning",
