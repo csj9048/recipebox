@@ -6,6 +6,8 @@ import { supabase } from '../utils/supabase/client';
 import { Recipe } from '../types/recipe';
 import { Image } from 'expo-image';
 import { getGuestRecipes } from '../utils/storage';
+import { useTranslation } from 'react-i18next';
+import i18next from '../locales';
 
 interface RecipeSelectorProps {
     onSelect: (recipe: Recipe) => void;
@@ -13,6 +15,9 @@ interface RecipeSelectorProps {
 }
 
 export function RecipeSelector({ onSelect, onClose }: RecipeSelectorProps) {
+    const { t } = useTranslation();
+    const safeT = (key: string, options?: any) => i18next.t(key, options);
+
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -91,14 +96,14 @@ export function RecipeSelector({ onSelect, onClose }: RecipeSelectorProps) {
                     <Ionicons name="search" size={20} color={Colors.gray[400]} />
                     <TextInput
                         style={styles.input}
-                        placeholder="레시피 검색..."
+                        placeholder={safeT('recipe_selector.search_placeholder')}
                         value={searchQuery}
                         onChangeText={setSearchQuery}
                         autoFocus
                     />
                 </View>
                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                    <Text style={styles.closeButtonText}>닫기</Text>
+                    <Text style={styles.closeButtonText}>{safeT('recipe_selector.close')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -114,7 +119,7 @@ export function RecipeSelector({ onSelect, onClose }: RecipeSelectorProps) {
                     contentContainerStyle={styles.list}
                     ListEmptyComponent={
                         <View style={styles.center}>
-                            <Text style={styles.emptyText}>레시피가 없습니다</Text>
+                            <Text style={styles.emptyText}>{safeT('recipe_selector.empty')}</Text>
                         </View>
                     }
                 />

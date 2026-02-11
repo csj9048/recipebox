@@ -11,6 +11,8 @@ import { getGuestRecipes, clearGuestRecipes } from '../utils/storage';
 import { convertImageToBase64, uploadImage } from '../utils/image';
 import { RecipeInsert } from '../types/recipe';
 import * as FileSystem from 'expo-file-system';
+import { useTranslation } from 'react-i18next';
+import i18next from '../locales';
 
 interface AuthModalProps {
     visible: boolean;
@@ -22,6 +24,10 @@ interface AuthModalProps {
 WebBrowser.maybeCompleteAuthSession();
 
 export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth' }: AuthModalProps) {
+    const { t } = useTranslation();
+    // Helper to use global i18n for Modal content to avoid context loss issues
+    const safeT = (key: string, options?: any) => i18next.t(key, options);
+
     const [viewMode, setViewMode] = useState<'auth' | 'sync'>(initialViewMode);
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
@@ -120,7 +126,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
 
     const handleSubmit = async () => {
         if (!email || !password) {
-            Alert.alert('알림', '이메일과 비밀번호를 입력해주세요.');
+            Alert.alert(safeT('common.notice'), safeT('auth_modal.alert.input_required'));
             return;
         }
 
@@ -144,8 +150,8 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                 if (data.session) {
                     Toast.show({
                         type: 'success',
-                        text1: '가입 완료!',
-                        text2: '환영합니다!',
+                        text1: safeT('auth_modal.alert.signup_success'),
+                        text2: safeT('auth_modal.alert.welcome'),
                         visibilityTime: 4000,
                     });
                     // Listener will handle next steps
@@ -158,23 +164,23 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                     if (!signInError && signInData.session) {
                         Toast.show({
                             type: 'success',
-                            text1: '가입 완료!',
-                            text2: '환영합니다!',
+                            text1: safeT('auth_modal.alert.signup_success'),
+                            text2: safeT('auth_modal.alert.welcome'),
                             visibilityTime: 4000,
                         });
                         // Listener will handle next steps
                     } else {
-                        Alert.alert('회원가입 성공', '이메일로 인증 메일을 보냈습니다. 확인 후 로그인해주세요.');
+                        Alert.alert(safeT('auth_modal.title.signup'), safeT('auth_modal.alert.signup_email_sent'));
                         setIsLogin(true);
                     }
                 }
             }
         } catch (error: any) {
-            let msg = error.message || '요청 처리에 실패했습니다.';
+            let msg = error.message || safeT('auth_modal.alert.error_request');
             if (msg.includes('Invalid login credentials')) {
-                msg = '계정이 없거나 비밀번호가 틀렸습니다.';
+                msg = safeT('auth_modal.alert.login_failed_invalid');
             }
-            Alert.alert('오류', msg);
+            Alert.alert(safeT('common.error'), msg);
         } finally {
             setLoading(false);
         }
@@ -216,7 +222,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
 
                 if (error) {
                     console.error('Supabase Apple Sign-In Error:', error);
-                    Alert.alert('로그인 실패', error.message);
+                    Alert.alert(safeT('auth_modal.alert.error_title'), error.message);
                 } else {
                     // onSuccess will be triggered by onAuthStateChange in RootLayout
                     onSuccess?.();
@@ -229,7 +235,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                 // user canceled
             } else {
                 console.error('Apple Login Error:', e);
-                Alert.alert('로그인 오류', 'Apple 로그인 중 문제가 발생했습니다.');
+                Alert.alert(safeT('auth_modal.alert.error_title'), safeT('auth_modal.alert.apple_login_error'));
             }
         }
     };
@@ -289,7 +295,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
             }
         } catch (error: any) {
             console.error('Kakao login error:', error);
-            Alert.alert('로그인 오류', error.message || '카카오 로그인 중 문제가 발생했습니다.');
+            Alert.alert(safeT('auth_modal.alert.error_title'), error.message || safeT('auth_modal.alert.kakao_login_error'));
         } finally {
             setLoading(false);
         }
@@ -302,7 +308,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {
-                Alert.alert('오류', '로그인 정보가 없습니다.');
+                Alert.alert(safeT('common.error'), safeT('auth_modal.alert.no_login_info'));
                 return;
             }
 
@@ -375,14 +381,14 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
             await clearGuestRecipes();
             Toast.show({
                 type: 'success',
-                text1: '동기화 완료',
-                text2: `${successCount}개의 레시피를 저장했습니다.`,
+                text1: safeT('auth_modal.sync.success'),
+                text2: safeT('auth_modal.sync.success_detail', { count: successCount }),
             });
             onSuccess();
             onClose();
         } catch (e) {
             console.error(e);
-            Alert.alert('오류', '동기화 중 문제가 발생했습니다.');
+            Alert.alert(safeT('common.error'), safeT('auth_modal.alert.sync_error'));
         } finally {
             setLoading(false);
         }
@@ -390,12 +396,12 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
 
     const handleDiscard = () => {
         Alert.alert(
-            '주의',
-            '로그인 전에 만든 레시피는 사라져요. 정말 삭제할까요?',
+            safeT('auth_modal.sync.alert_title'),
+            safeT('auth_modal.sync.alert_message'),
             [
-                { text: '취소', style: 'cancel' },
+                { text: safeT('common.cancel'), style: 'cancel' },
                 {
-                    text: '삭제하고 로그인',
+                    text: safeT('auth_modal.sync.alert_confirm'),
                     style: 'destructive',
                     onPress: async () => {
                         await clearGuestRecipes();
@@ -419,7 +425,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                     {/* Header */}
                     <View style={styles.header}>
                         <Text style={styles.title}>
-                            {viewMode === 'auth' ? (isLogin ? '로그인' : '회원가입') : '데이터 연동'}
+                            {viewMode === 'auth' ? (isLogin ? safeT('auth_modal.title.login') : safeT('auth_modal.title.signup')) : safeT('auth_modal.title.sync')}
                         </Text>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                             <Ionicons name="close" size={24} color={Colors.text.primary} />
@@ -433,17 +439,15 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                 {isLogin ? (
                                     <>
                                         <Text style={styles.infoText}>
-                                            기존 계정으로 로그인하면{'\n'}
-                                            계정에 저장된 레시피가 표시됩니다.
+                                            {safeT('auth_modal.info.login_desc')}
                                         </Text>
                                         <Text style={styles.infoTextSmall}>
-                                            이 기기에서 만든 레시피는 로그아웃하면 다시 볼 수 있어요
+                                            {safeT('auth_modal.info.login_sub')}
                                         </Text>
                                     </>
                                 ) : (
                                     <Text style={styles.infoText}>
-                                        가입하면 이 기기에서 만든 레시피가{'\n'}
-                                        계정에 안전하게 저장됩니다.
+                                        {safeT('auth_modal.info.signup_desc')}
                                     </Text>
                                 )}
                             </View>
@@ -451,7 +455,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                             <View style={styles.form}>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="이메일"
+                                    placeholder={safeT('auth_modal.placeholder.email')}
                                     value={email}
                                     onChangeText={setEmail}
                                     autoCapitalize="none"
@@ -460,7 +464,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                 />
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="비밀번호"
+                                    placeholder={safeT('auth_modal.placeholder.password')}
                                     value={password}
                                     onChangeText={setPassword}
                                     secureTextEntry
@@ -477,7 +481,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                         <ActivityIndicator color={Colors.white} />
                                     ) : (
                                         <Text style={styles.submitButtonText}>
-                                            {isLogin ? '로그인' : '회원가입'}
+                                            {isLogin ? safeT('auth_modal.button.login') : safeT('auth_modal.button.signup')}
                                         </Text>
                                     )}
                                 </TouchableOpacity>
@@ -489,7 +493,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                 >
                                     <Ionicons name="chatbubble" size={20} color="#000000" />
                                     <Text style={[styles.socialButtonText, { color: '#000000' }]}>
-                                        {isLogin ? '카카오 로그인' : '카카오로 가입하기'}
+                                        {isLogin ? safeT('auth_modal.button.kakao_login') : safeT('auth_modal.button.kakao_signup')}
                                     </Text>
                                 </TouchableOpacity>
 
@@ -508,7 +512,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                     onPress={() => setIsLogin(!isLogin)}
                                 >
                                     <Text style={styles.switchButtonText}>
-                                        {isLogin ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인'}
+                                        {isLogin ? safeT('auth_modal.button.switch_to_signup') : safeT('auth_modal.button.switch_to_login')}
                                     </Text>
                                 </TouchableOpacity>
 
@@ -517,13 +521,13 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                         style={styles.forgotPasswordButton}
                                         onPress={() => {
                                             if (!email) {
-                                                Alert.alert('알림', '이메일을 입력해주세요.');
+                                                Alert.alert(safeT('common.notice'), safeT('auth_modal.alert.input_email'));
                                                 return;
                                             }
-                                            Alert.alert('비밀번호 재설정', '기능 준비중입니다.');
+                                            Alert.alert(safeT('common.notice'), safeT('auth_modal.alert.feature_wip'));
                                         }}
                                     >
-                                        <Text style={styles.forgotPasswordText}>비밀번호를 잊으셨나요?</Text>
+                                        <Text style={styles.forgotPasswordText}>{safeT('auth_modal.button.forgot_password')}</Text>
                                     </TouchableOpacity>
                                 )}
                             </View>
@@ -535,11 +539,10 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                 <Ionicons name="cloud-upload" size={48} color={Colors.primary} />
                             </View>
                             <Text style={styles.syncTitle}>
-                                작성한 레시피가 {guestRecipeCount}개 있어요!
+                                {safeT('auth_modal.sync.title', { count: guestRecipeCount })}
                             </Text>
                             <Text style={styles.syncDescription}>
-                                로그인 전 작성한 레시피를{'\n'}
-                                현재 계정으로 옮겨올까요?
+                                {safeT('auth_modal.sync.description')}
                             </Text>
 
                             <View style={styles.syncActions}>
@@ -551,7 +554,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                     {loading ? (
                                         <ActivityIndicator color={Colors.white} />
                                     ) : (
-                                        <Text style={styles.syncButtonTextPrimary}>네, 계정에 저장할래요</Text>
+                                        <Text style={styles.syncButtonTextPrimary}>{safeT('auth_modal.sync.confirm')}</Text>
                                     )}
                                 </TouchableOpacity>
 
@@ -560,7 +563,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                     onPress={handleDiscard}
                                     disabled={loading}
                                 >
-                                    <Text style={styles.syncButtonTextSecondary}>아니요, 삭제해주세요</Text>
+                                    <Text style={styles.syncButtonTextSecondary}>{safeT('auth_modal.sync.discard')}</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

@@ -11,9 +11,11 @@ import { AuthModal } from '../../components/AuthModal';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import Toast from 'react-native-toast-message';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsScreen() {
     const insets = useSafeAreaInsets();
+    const { t } = useTranslation();
     const [user, setUser] = useState<any>(null);
     const [authModalVisible, setAuthModalVisible] = useState(false);
 
@@ -39,10 +41,10 @@ export default function SettingsScreen() {
     };
 
     const handleLogout = async () => {
-        Alert.alert('로그아웃', '로그아웃 하시겠습니까?', [
-            { text: '취소', style: 'cancel' },
+        Alert.alert(t('settings.alert.logout_title'), t('settings.alert.logout_message'), [
+            { text: t('common.cancel'), style: 'cancel' },
             {
-                text: '로그아웃',
+                text: t('settings.menu.logout'),
                 style: 'destructive',
                 onPress: async () => {
                     await supabase.auth.signOut();
@@ -64,12 +66,12 @@ export default function SettingsScreen() {
 
     const handleDeleteAccount = async () => {
         Alert.alert(
-            '회원 탈퇴',
-            '정말 탈퇴하시겠습니까?\n작성한 모든 레시피가 삭제되며 복구할 수 없습니다.',
+            t('settings.alert.delete_account_title'),
+            t('settings.alert.delete_account_message'),
             [
-                { text: '취소', style: 'cancel' },
+                { text: t('common.cancel'), style: 'cancel' },
                 {
-                    text: '탈퇴하기',
+                    text: t('settings.alert.delete_confirm'),
                     style: 'destructive',
                     onPress: async () => {
                         try {
@@ -118,10 +120,10 @@ export default function SettingsScreen() {
                             // 3. Sign out locally
                             await supabase.auth.signOut();
                             setUser(null);
-                            Alert.alert('알림', '회원 탈퇴가 완료되었습니다.');
+                            Alert.alert(t('common.notice'), t('settings.alert.delete_success'));
 
                         } catch (error: any) {
-                            Alert.alert('오류', '탈퇴 처리에 실패했습니다. 다시 시도해주세요.');
+                            Alert.alert(t('common.error'), t('settings.alert.delete_failed'));
                             console.error('Account deletion error:', error);
                         }
                     },
@@ -134,7 +136,7 @@ export default function SettingsScreen() {
         <View style={[styles.container]}>
             <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
                 <View style={{ width: 40, height: 40 }} />
-                <Text style={styles.headerTitle}>설정</Text>
+                <Text style={styles.headerTitle}>{t('settings.title')}</Text>
                 <View style={{ width: 40, height: 40 }} />
             </View>
             <ScrollView contentContainerStyle={styles.content}>
@@ -155,12 +157,12 @@ export default function SettingsScreen() {
                             )}
                             <View>
                                 <Text style={styles.emailText}>
-                                    {user.user_metadata?.full_name || user.user_metadata?.name || (user.email && user.email.includes('privaterelay') ? 'Apple 사용자' : user.email) || '사용자'}님
+                                    {user.user_metadata?.full_name || user.user_metadata?.name || (user.email && user.email.includes('privaterelay') ? t('settings.user.apple_user') : user.email) || t('settings.user.user')}님
                                 </Text>
                                 <Text style={styles.loginStatusText}>
-                                    {user.app_metadata?.provider === 'kakao' ? '카카오 로그인됨' :
-                                        user.app_metadata?.provider === 'apple' ? 'Apple 로그인됨' :
-                                            (user.email && !user.email.includes('@recipebox') ? user.email : '로그인됨')}
+                                    {user.app_metadata?.provider === 'kakao' ? t('settings.user.kakao_login') :
+                                        user.app_metadata?.provider === 'apple' ? t('settings.user.apple_login') :
+                                            (user.email && !user.email.includes('@recipebox') ? user.email : t('settings.user.logged_in'))}
                                 </Text>
                             </View>
                         </View>
@@ -170,10 +172,9 @@ export default function SettingsScreen() {
                             onPress={() => setAuthModalVisible(true)}
                         >
                             <View style={styles.loginCardContent}>
-                                <Text style={styles.loginTitle}>로그인하기</Text>
+                                <Text style={styles.loginTitle}>{t('settings.login_card.title')}</Text>
                                 <Text style={styles.loginSubtitle}>
-                                    지금까지 만든 레시피를 연동하고{'\n'}
-                                    다른 기기에서도 사용할 수 있어요
+                                    {t('settings.login_card.subtitle')}
                                 </Text>
                             </View>
                             <Ionicons name="chevron-forward" size={24} color={Colors.gray[400]} />
@@ -183,21 +184,21 @@ export default function SettingsScreen() {
 
                 {/* Menu Items */}
                 <View style={styles.menuSection}>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => Alert.alert('앱 정보', `버전: ${Constants.expoConfig?.version || '1.0.0'}`)}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => Alert.alert(t('settings.menu.app_info'), `Version ${Constants.expoConfig?.version || '1.0.0'}`)}>
                         <Ionicons name="information-circle-outline" size={24} color={Colors.text.primary} />
-                        <Text style={styles.menuText}>앱 정보</Text>
+                        <Text style={styles.menuText}>{t('settings.menu.app_info')}</Text>
                         <Ionicons name="chevron-forward" size={20} color={Colors.gray[300]} />
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.menuItem} onPress={handleReview}>
                         <Ionicons name="star-outline" size={24} color={Colors.text.primary} />
-                        <Text style={styles.menuText}>리뷰 남기기</Text>
+                        <Text style={styles.menuText}>{t('settings.menu.review')}</Text>
                         <Ionicons name="chevron-forward" size={20} color={Colors.gray[300]} />
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.menuItem} onPress={() => Linking.openURL('https://bit.ly/45aSoSQ')}>
                         <Ionicons name="document-text-outline" size={24} color={Colors.text.primary} />
-                        <Text style={styles.menuText}>서비스 이용 약관</Text>
+                        <Text style={styles.menuText}>{t('settings.menu.terms')}</Text>
                         <Ionicons name="chevron-forward" size={20} color={Colors.gray[300]} />
                     </TouchableOpacity>
                 </View>
@@ -206,11 +207,11 @@ export default function SettingsScreen() {
                 {user && (
                     <View style={styles.footerButtons}>
                         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                            <Text style={styles.logoutText}>로그아웃</Text>
+                            <Text style={styles.logoutText}>{t('settings.menu.logout')}</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.withdrawalButton} onPress={handleDeleteAccount}>
-                            <Text style={styles.withdrawalText}>회원 탈퇴</Text>
+                            <Text style={styles.withdrawalText}>{t('settings.menu.delete_account')}</Text>
                         </TouchableOpacity>
                     </View>
                 )}

@@ -8,13 +8,15 @@ import Toast from 'react-native-toast-message';
 import analytics from '@react-native-firebase/analytics';
 
 import { AuthModal } from '../components/AuthModal';
-import { getGuestRecipes, getIsFirstLaunch, setIsFirstLaunch } from '../utils/storage';
+import { getGuestRecipes, getIsFirstLaunch, setIsFirstLaunch, getLastAdShownTime, setLastAdShownTime } from '../utils/storage';
 
 import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import * as SplashScreen from 'expo-splash-screen';
 import { requestTrackingPermissionsAsync, getTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { AppOpenAd, TestIds, AdEventType } from 'react-native-google-mobile-ads';
+import '../locales'; // Initialize i18n
+import { useTranslation } from 'react-i18next';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -32,6 +34,7 @@ const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
 });
 
 export default function RootLayout() {
+  const { t } = useTranslation();
   const [authModalVisible, setAuthModalVisible] = useState(false);
   const [appIsReady, setAppIsReady] = useState(false);
   const [loaded, error] = useFonts({
@@ -63,6 +66,18 @@ export default function RootLayout() {
           await setIsFirstLaunch(false);
           setAppIsReady(true);
         } else {
+          // Check Ad Frequency
+          const lastAdTime = await getLastAdShownTime();
+          const currentTime = Date.now();
+          const timeDiff = currentTime - lastAdTime;
+          const oneHour = 60 * 60 * 1000;
+
+          if (timeDiff < oneHour) {
+            console.log('Ad skipped: Frequency limit (60 mins)');
+            setAppIsReady(true);
+            return;
+          }
+
           // Subsequent Launch Logic: Load App Open Ad
           appOpenAd.load();
 
@@ -88,6 +103,7 @@ export default function RootLayout() {
 
           if (result === 'LOADED') {
             appOpenAd.show();
+            await setLastAdShownTime(Date.now());
             // Wait for ad to be closed before hiding splash
             await new Promise(resolve => {
               const unsubscribeClosed = appOpenAd.addAdEventListener(AdEventType.CLOSED, () => {
@@ -136,7 +152,7 @@ export default function RootLayout() {
       if (code && typeof code === 'string') {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error) {
-          Toast.show({ type: 'success', text1: '로그인 성공', text2: '잠시 후 데이터 연동이 시작됩니다.' });
+          Toast.show({ type: 'success', text1: t('common.login_success'), text2: t('common.data_sync_start') });
           setTimeout(async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {

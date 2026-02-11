@@ -162,6 +162,26 @@ export const setIsFirstLaunch = async (isFirst: boolean): Promise<void> => {
 };
 // --- Guest Shopping List ---
 
+const LAST_AD_SHOWN_KEY = 'last_ad_shown_time';
+
+export const getLastAdShownTime = async (): Promise<number> => {
+    try {
+        const value = await AsyncStorage.getItem(LAST_AD_SHOWN_KEY);
+        return value ? parseInt(value, 10) : 0;
+    } catch (e) {
+        console.error('Failed to get last ad shown time', e);
+        return 0;
+    }
+};
+
+export const setLastAdShownTime = async (timestamp: number): Promise<void> => {
+    try {
+        await AsyncStorage.setItem(LAST_AD_SHOWN_KEY, timestamp.toString());
+    } catch (e) {
+        console.error('Failed to set last ad shown time', e);
+    }
+};
+
 export interface GuestShoppingItem {
     id: string;
     text: string;

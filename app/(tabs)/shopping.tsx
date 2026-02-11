@@ -7,6 +7,7 @@ import { supabase } from '../../utils/supabase/client';
 import Toast from 'react-native-toast-message';
 import analytics from '@react-native-firebase/analytics';
 import { useFocusEffect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import {
   getGuestShoppingList,
   addGuestShoppingItem,
@@ -23,6 +24,7 @@ interface ShoppingItem {
 
 export default function ShoppingScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const [items, setItems] = useState<ShoppingItem[]>([]);
   const [newItemText, setNewItemText] = useState('');
   const [loading, setLoading] = useState(true);
@@ -54,7 +56,7 @@ export default function ShoppingScreen() {
       setItems(data || []);
     } catch (error) {
       console.error('Error fetching shopping items:', error);
-      Toast.show({ type: 'error', text1: '리스트를 불러오지 못했습니다' });
+      Toast.show({ type: 'error', text1: t('shopping.message.load_failed') });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -100,7 +102,7 @@ export default function ShoppingScreen() {
       });
     } catch (error) {
       console.error('Error adding item:', error);
-      Toast.show({ type: 'error', text1: '추가 실패' });
+      Toast.show({ type: 'error', text1: t('shopping.message.add_failed') });
     }
   };
 
@@ -126,10 +128,10 @@ export default function ShoppingScreen() {
   };
 
   const handleDeleteItem = async (id: string) => {
-    Alert.alert('삭제', '이 항목을 삭제하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
+    Alert.alert(t('shopping.alert.delete_title'), t('shopping.alert.delete_message'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: '삭제',
+        text: t('shopping.alert.delete_confirm'),
         style: 'destructive',
         onPress: async () => {
           try {
@@ -153,12 +155,12 @@ export default function ShoppingScreen() {
 
   const handleReset = () => {
     Alert.alert(
-      '장보기 목록 초기화',
-      '전체 목록을 삭제하시겠습니까?',
+      t('shopping.alert.reset_title'),
+      t('shopping.alert.reset_message'),
       [
-        { text: '취소', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: '전체 삭제',
+          text: t('shopping.alert.reset_confirm'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -176,10 +178,10 @@ export default function ShoppingScreen() {
                 if (error) throw error;
               }
               fetchItems();
-              Toast.show({ type: 'success', text1: '목록이 초기화되었습니다' });
+              Toast.show({ type: 'success', text1: t('shopping.message.reset_success') });
             } catch (error) {
               console.error('Error resetting list:', error);
-              Toast.show({ type: 'error', text1: '초기화 실패' });
+              Toast.show({ type: 'error', text1: t('shopping.message.reset_failed') });
             }
           }
         }
@@ -229,7 +231,7 @@ export default function ShoppingScreen() {
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <View style={{ width: 40, height: 40 }} />
-        <Text style={styles.headerTitle}>장보기</Text>
+        <Text style={styles.headerTitle}>{t('shopping.title')}</Text>
         <TouchableOpacity onPress={handleReset} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
           <Ionicons name="trash-bin-outline" size={24} color={Colors.error} />
         </TouchableOpacity>
@@ -238,7 +240,7 @@ export default function ShoppingScreen() {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="살 것을 입력하세요 (예: 우유 2팩)"
+          placeholder={t('shopping.placeholder')}
           value={newItemText}
           onChangeText={setNewItemText}
           onSubmitEditing={handleAddItem}
@@ -258,8 +260,8 @@ export default function ShoppingScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="cart-outline" size={48} color={Colors.gray[300]} />
-            <Text style={styles.emptyText}>장보기 목록이 비어있어요</Text>
-            <Text style={styles.emptySubText}>레시피에서 재료를 추가하거나{'\n'}직접 입력해보세요</Text>
+            <Text style={styles.emptyText}>{t('shopping.empty.text')}</Text>
+            <Text style={styles.emptySubText}>{t('shopping.empty.subtext')}</Text>
           </View>
         }
       />

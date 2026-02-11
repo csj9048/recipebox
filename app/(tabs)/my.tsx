@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 export default function MyPageScreen() {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>MY 페이지 (나중에 구현)</Text>
+      <Text style={styles.text}>{t('my_page.title')}</Text>
     </View>
   );
 }

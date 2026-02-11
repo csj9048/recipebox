@@ -1,0 +1,265 @@
+{
+    "tabs": {
+        "recipe": "Recipes",
+        "meal": "Meal Plan",
+        "shopping": "Shopping",
+        "settings": "Settings"
+    },
+    "common": {
+        "ok": "OK",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "notice": "Notice",
+        "error": "Error",
+        "warning": "Warning",
+        "login_success": "Login Successful",
+        "data_sync_start": "Data sync will start shortly.",
+        "menu": "Menu",
+        "add": "Add"
+    },
+    "home": {
+        "title": "RecipeBox",
+        "search_placeholder": "Search by hashtag (e.g. #breakfast)",
+        "loading": "Loading...",
+        "empty": {
+            "title": "No recipes yet",
+            "subtitle": "Add your first recipe!"
+        },
+        "error": {
+            "load_failed": "Failed to load recipes",
+            "delete_failed": "Failed to delete recipe"
+        }
+    },
+    "add_to_meal": {
+        "title": "Add to Meal Plan",
+        "select_date": "Select Date",
+        "meal_time": "Meal Time",
+        "meal_types": {
+            "breakfast": "Breakfast",
+            "lunch": "Lunch",
+            "dinner": "Dinner"
+        },
+        "add_button": "Add"
+    },
+    "auth_modal": {
+        "title": {
+            "login": "Sign In",
+            "signup": "Sign Up",
+            "sync": "Sync Data"
+        },
+        "placeholder": {
+            "email": "Email",
+            "password": "Password"
+        },
+        "button": {
+            "login": "Sign In",
+            "signup": "Sign Up",
+            "kakao_login": "Sign in with Kakao",
+            "kakao_signup": "Sign up with Kakao",
+            "switch_to_signup": "Don't have an account? Sign Up",
+            "switch_to_login": "Already have an account? Sign In",
+            "forgot_password": "Forgot Password?"
+        },
+        "info": {
+            "login_desc": "Sign in with your existing account\\nto see your saved recipes.",
+            "login_sub": "Recipes created on this device will be hidden after logout",
+            "signup_desc": "Sign up to safely save recipes\\ncreated on this device to your account."
+        },
+        "sync": {
+            "title": "You have {{count}} recipes!",
+            "description": "Would you like to move recipes created before login\\nto your current account?",
+            "confirm": "Yes, save to account",
+            "discard": "No, delete them",
+            "alert_title": "Warning",
+            "alert_message": "Recipes created before login will be lost. Are you sure you want to delete them?",
+            "alert_confirm": "Delete and Sign In",
+            "success": "Sync Complete",
+            "success_detail": "Saved {{count}} recipes."
+        },
+        "alert": {
+            "input_required": "Please enter email and password.",
+            "signup_success": "Sign Up Complete!",
+            "welcome": "Welcome!",
+            "signup_email_sent": "A verification email has been sent. Please check your email and log in.",
+            "login_failed_invalid": "Invalid account or password.",
+            "error_title": "Error",
+            "error_request": "Request failed.",
+            "apple_login_error": "Apple Login encountered an error.",
+            "kakao_login_error": "Kakao Login encountered an error.",
+            "no_login_info": "No login information found.",
+            "sync_error": "A problem occurred during sync.",
+            "input_email": "Please enter your email.",
+            "feature_wip": "This feature is coming soon."
+        }
+    },
+    "meal": {
+        "title_current": "Current Week Meal Plan",
+        "title_next": "Next Week Meal Plan",
+        "type": {
+            "breakfast": "Breakfast",
+            "lunch": "Lunch",
+            "dinner": "Dinner"
+        },
+        "days": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ],
+        "modal": {
+            "title": "Enter Menu",
+            "placeholder": "Enter menu name (e.g. Sandwich)",
+            "submit": "Done",
+            "or": "or",
+            "select_recipe": "Select from Recipes"
+        },
+        "message": {
+            "added": "Added",
+            "save_failed": "Save Failed",
+            "deleted": "Deleted",
+            "delete_failed": "Failed to delete"
+        }
+    },
+    "shopping": {
+        "title": "Shopping",
+        "placeholder": "Add item (e.g. Milk)",
+        "empty": {
+            "text": "Shopping list is empty",
+            "subtext": "Add ingredients from recipes\nor add manually"
+        },
+        "alert": {
+            "delete_title": "Delete",
+            "delete_message": "Delete this item?",
+            "delete_confirm": "Delete",
+            "reset_title": "Clear List",
+            "reset_message": "Delete all items?",
+            "reset_confirm": "Clear All"
+        },
+        "message": {
+            "load_failed": "Failed to load list",
+            "add_failed": "Failed to add",
+            "reset_success": "List cleared",
+            "reset_failed": "Failed to clear"
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "user": {
+            "apple_user": "Apple User",
+            "user": "User",
+            "kakao_login": "Logged in with Kakao",
+            "apple_login": "Logged in with Apple",
+            "logged_in": "Logged in"
+        },
+        "login_card": {
+            "title": "Sign In",
+            "subtitle": "Sync your recipes and access them\non other devices"
+        },
+        "menu": {
+            "app_info": "App Info",
+            "review": "Write a Review",
+            "terms": "Terms of Service",
+            "logout": "Log Out",
+            "delete_account": "Delete Account"
+        },
+        "alert": {
+            "logout_title": "Log Out",
+            "logout_message": "Are you sure you want to log out?",
+            "delete_account_title": "Delete Account",
+            "delete_account_message": "Are you sure?\nAll your recipes will be permanently deleted.",
+            "delete_confirm": "Delete",
+            "delete_success": "Account deleted successfully.",
+            "delete_failed": "Failed to delete account. Please try again."
+        }
+    },
+    "recipe_form": {
+        "title": {
+            "new": "Add New Recipe",
+            "edit": "Edit Recipe"
+        },
+        "label": {
+            "photo": "Photo",
+            "add_photo": "Add Photo",
+            "title": "Recipe Title",
+            "title_placeholder": "e.g. Tuna Sandwich",
+            "body": "Recipe Text",
+            "body_placeholder": "Enter recipe content or upload an image",
+            "expand_image": "Expand Image",
+            "collapse_image": "Collapse Image",
+            "ai_analyzing": "Analyzing...",
+            "ai_analyze": "Get Recipe with AI",
+            "ai_description": "We will organize the recipe from the photo and add ingredient hashtags.",
+            "add_image": "Add Image",
+            "ingredient_tags": "Ingredient Hashtags",
+            "ingredient_placeholder": "e.g. Cucumber, Tuna",
+            "add": "Add",
+            "situation_tags": "Situation Hashtags",
+            "situation_placeholder": "e.g. Baby food, Traditional, Quick meal",
+            "memo": "Comment",
+            "memo_placeholder": "e.g. It was a bit salty, add less salt next time.",
+            "saving": "Saving...",
+            "save_button": "Save Recipe"
+        },
+        "alert": {
+            "permission_title": "Permission Required",
+            "permission_message": "Gallery access is required.",
+            "max_image": "You can upload up to 2 images.",
+            "upload_first": "Please upload an image to analyze first.",
+            "analysis_failed": "Image analysis failed.",
+            "fetch_failed": "Failed to fetch recipe.",
+            "analysis_success": "Image analysis complete!",
+            "analysis_error": "An error occurred during image analysis.",
+            "title_required": "Please enter a recipe title.",
+            "content_required": "Please enter recipe content or upload an image.",
+            "save_failed": "Failed to save recipe.",
+            "update_failed": "Failed to update recipe.",
+            "save_error": "An error occurred while saving the recipe."
+        }
+    },
+    "recipe_detail": {
+        "title": "Recipe",
+        "menu": {
+            "edit": "Edit",
+            "delete": "Delete"
+        },
+        "section": {
+            "comment": "Comment",
+            "ingredient": "Ingredients",
+            "situation": "Categories"
+        },
+        "button": {
+            "add_to_meal_plan": "Add to Meal Plan"
+        },
+        "alert": {
+            "meal_added": "Added to meal plan",
+            "meal_add_failed": "Failed to add to meal plan",
+            "delete_title": "Delete Recipe",
+            "delete_message": "Are you sure you want to delete this recipe?",
+            "delete_failed": "Failed to delete recipe",
+            "shop_add_title": "Add to Shopping List",
+            "shop_add_message": "Add '{{item}}' to shopping list?",
+            "shop_added": "Added to shopping list",
+            "shop_add_failed": "Failed to add"
+        }
+    },
+    "recipe_selector": {
+        "search_placeholder": "Search recipes...",
+        "close": "Close",
+        "empty": "No recipes found"
+    },
+    "recipe_card": {
+        "untitled": "Untitled"
+    },
+    "recipe_detail_screen": {
+        "loading": "Loading...",
+        "not_found": "Recipe not found",
+        "load_error": "Failed to load recipe"
+    },
+    "my_page": {
+        "title": "My Page (Coming Soon)"
+    }
+}

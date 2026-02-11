@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import { AddToMealModal } from './AddToMealModal';
 import analytics from '@react-native-firebase/analytics';
 import { addGuestMealPlan, addGuestShoppingItem } from '../utils/storage';
+import { useTranslation } from 'react-i18next';
 
 interface RecipeDetailProps {
   recipe: Recipe;
@@ -21,6 +22,7 @@ interface RecipeDetailProps {
 export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetailProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const situationTags = recipe.tags.filter(t => t.type === 'situation');
   const ingredientTags = recipe.tags.filter(t => t.type === 'ingredient');
   const [showMenu, setShowMenu] = useState(false);
@@ -52,7 +54,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
 
       Toast.show({
         type: 'success',
-        text1: '식단에 추가되었습니다',
+        text1: t('recipe_detail.alert.meal_added'),
       });
 
       await analytics().logEvent('menu_added', {
@@ -67,7 +69,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
       console.error('Error adding to meal plan:', error);
       Toast.show({
         type: 'error',
-        text1: '식단 추가에 실패했습니다',
+        text1: t('recipe_detail.alert.meal_add_failed'),
       });
     }
   };
@@ -94,12 +96,12 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
 
   const handleDelete = () => {
     Alert.alert(
-      '레시피 삭제',
-      '이 레시피를 삭제하시겠습니까?',
+      t('recipe_detail.alert.delete_title'),
+      t('recipe_detail.alert.delete_message'),
       [
-        { text: '취소', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: '삭제',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             if (onDelete) {
@@ -113,7 +115,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
                 console.error(err);
                 Toast.show({
                   type: 'error',
-                  text1: '레시피 삭제에 실패했습니다',
+                  text1: t('recipe_detail.alert.delete_failed'),
                 });
               }
             }
@@ -140,7 +142,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
           <Ionicons name="chevron-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
-          {recipe.title || '레시피'}
+          {recipe.title || t('recipe_detail.title')}
         </Text>
         <View style={styles.headerRight}>
           <TouchableOpacity onPress={() => setShowMenu(!showMenu)} style={styles.headerButton}>
@@ -152,11 +154,11 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
               <View style={styles.menu}>
                 <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
                   <Ionicons name="create-outline" size={18} color={Colors.text.primary} />
-                  <Text style={styles.menuItemText}>수정하기</Text>
+                  <Text style={styles.menuItemText}>{t('recipe_detail.menu.edit')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
                   <Ionicons name="trash-outline" size={18} color={Colors.error} />
-                  <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>삭제하기</Text>
+                  <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>{t('recipe_detail.menu.delete')}</Text>
                 </TouchableOpacity>
               </View>
             </>
@@ -188,7 +190,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
                   onPress={() => setImageCollapsed(false)}
                   style={styles.collapseButton}
                 >
-                  <Text style={styles.collapseButtonText}>이미지 펼치기</Text>
+                  <Text style={styles.collapseButtonText}>{t('recipe_form.label.expand_image')}</Text>
                 </TouchableOpacity>
               ) : (
                 <View style={styles.imageContainer}>
@@ -235,7 +237,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
                       onPress={() => setImageCollapsed(true)}
                       style={styles.collapseButtonBottom}
                     >
-                      <Text style={styles.collapseButtonText}>이미지 접기</Text>
+                      <Text style={styles.collapseButtonText}>{t('recipe_form.label.collapse_image')}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -246,7 +248,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
           {/* Memo */}
           {recipe.memo && (
             <View style={styles.memoSection}>
-              <Text style={styles.memoTitle}>코멘트</Text>
+              <Text style={styles.memoTitle}>{t('recipe_detail.section.comment')}</Text>
               <View style={styles.memoBox}>
                 <Text style={styles.memoText}>{recipe.memo}</Text>
               </View>
@@ -258,45 +260,49 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
             <View style={styles.tagsSection}>
               {ingredientTags.length > 0 && (
                 <View style={styles.tagGroup}>
-                  <Text style={styles.tagGroupTitle}>재료</Text>
+                  <Text style={styles.tagGroupTitle}>{t('recipe_detail.section.ingredient')}</Text>
                   <View style={styles.tagRow}>
                     {ingredientTags.map((tag, idx) => (
                       <TouchableOpacity
                         key={`ingredient-${idx}`}
                         style={[styles.tag, styles.ingredientTag]}
                         onPress={() => {
-                          Alert.alert('장보기 목록 추가', `'${tag.name}'을(를) 장보기 목록에 추가하시겠습니까?`, [
-                            { text: '취소', style: 'cancel' },
-                            {
-                              text: '추가',
-                              onPress: async () => {
-                                try {
-                                  const { data: { user } } = await supabase.auth.getUser();
+                          Alert.alert(
+                            t('recipe_detail.alert.shop_add_title'),
+                            t('recipe_detail.alert.shop_add_message', { item: tag.name }),
+                            [
+                              { text: t('common.cancel'), style: 'cancel' },
+                              {
+                                text: t('common.add'),
+                                onPress: async () => {
+                                  try {
+                                    const { data: { user } } = await supabase.auth.getUser();
 
-                                  if (user) {
-                                    const { error } = await supabase.from('shopping_items').insert({
-                                      user_id: user.id,
-                                      text: tag.name
+                                    if (user) {
+                                      const { error } = await supabase.from('shopping_items').insert({
+                                        user_id: user.id,
+                                        text: tag.name
+                                      });
+                                      if (error) throw error;
+                                    } else {
+                                      // Guest mode
+                                      await addGuestShoppingItem(tag.name);
+                                    }
+
+                                    Toast.show({ type: 'success', text1: t('recipe_detail.alert.shop_added') });
+
+                                    await analytics().logEvent('shopping_added', {
+                                      item: tag.name,
+                                      method: 'recipe_tag'
                                     });
-                                    if (error) throw error;
-                                  } else {
-                                    // Guest mode
-                                    await addGuestShoppingItem(tag.name);
+                                  } catch (e) {
+                                    console.error(e);
+                                    Toast.show({ type: 'error', text1: t('recipe_detail.alert.shop_add_failed') });
                                   }
-
-                                  Toast.show({ type: 'success', text1: '장보기 목록에 추가되었습니다' });
-
-                                  await analytics().logEvent('shopping_added', {
-                                    item: tag.name,
-                                    method: 'recipe_tag'
-                                  });
-                                } catch (e) {
-                                  console.error(e);
-                                  Toast.show({ type: 'error', text1: '추가 실패' });
                                 }
                               }
-                            }
-                          ])
+                            ]
+                          )
                         }}
                       >
                         <Text style={styles.tagText}>#{tag.name}</Text>
@@ -308,7 +314,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
               )}
               {situationTags.length > 0 && (
                 <View style={styles.tagGroup}>
-                  <Text style={styles.tagGroupTitle}>상황</Text>
+                  <Text style={styles.tagGroupTitle}>{t('recipe_detail.section.situation')}</Text>
                   <View style={styles.tagRow}>
                     {situationTags.map((tag, idx) => (
                       <View key={`situation-${idx}`} style={[styles.tag, styles.situationTag]}>
@@ -327,7 +333,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
       <View style={[styles.bottomButtonContainer, { paddingBottom: insets.bottom > 0 ? insets.bottom : 16 }]}>
         <TouchableOpacity onPress={() => setAddToMealModalVisible(true)} style={styles.bottomButton}>
           <Ionicons name="calendar-outline" size={20} color={Colors.text.primary} />
-          <Text style={styles.bottomButtonText}>식단에 추가하기</Text>
+          <Text style={styles.bottomButtonText}>{t('recipe_detail.button.add_to_meal_plan')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -335,7 +341,7 @@ export function RecipeDetail({ recipe, onDelete, onAddToMealPlan }: RecipeDetail
         visible={addToMealModalVisible}
         onClose={() => setAddToMealModalVisible(false)}
         onSave={handleAddToMealPlan}
-        recipeTitle={recipe.title || '레시피'}
+        recipeTitle={recipe.title || t('recipe_detail.title')}
       />
     </View>
   );

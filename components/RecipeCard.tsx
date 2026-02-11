@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { Recipe } from '../types/recipe';
 import { Colors } from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -13,12 +14,15 @@ interface RecipeCardProps {
 }
 
 export function RecipeCard({ recipe, onDelete, onView, onEdit }: RecipeCardProps) {
+  const { t } = useTranslation();
   const situationTags = recipe.tags.filter(t => t.type === 'situation');
   const ingredientTags = recipe.tags.filter(t => t.type === 'ingredient');
 
   const hasValidThumbnail = recipe.thumbnail_url &&
     recipe.thumbnail_url.trim() !== '' &&
-    recipe.thumbnail_url !== 'null';
+    recipe.thumbnail_url !== 'null' &&
+    recipe.thumbnail_url !== 'undefined' &&
+    (recipe.thumbnail_url.startsWith('http') || recipe.thumbnail_url.startsWith('file'));
 
   return (
     <Pressable

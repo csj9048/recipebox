@@ -1,0 +1,265 @@
+{
+    "tabs": {
+        "recipe": "レシピ",
+        "meal": "献立",
+        "shopping": "買い物",
+        "settings": "設定"
+    },
+    "common": {
+        "ok": "確認",
+        "cancel": "キャンセル",
+        "save": "保存",
+        "delete": "削除",
+        "notice": "お知らせ",
+        "error": "エラー",
+        "warning": "注意",
+        "login_success": "ログイン成功",
+        "data_sync_start": "まもなくデータ連携が始まります。",
+        "menu": "メニュー",
+        "add": "追加"
+    },
+    "home": {
+        "title": "RecipeBox",
+        "search_placeholder": "ハッシュタグで検索 (例: #朝食)",
+        "loading": "読み込み中...",
+        "empty": {
+            "title": "まだレシピがありません",
+            "subtitle": "最初のレシピを追加してみましょう！"
+        },
+        "error": {
+            "load_failed": "レシピの読み込みに失敗しました",
+            "delete_failed": "レシピの削除に失敗しました"
+        }
+    },
+    "add_to_meal": {
+        "title": "献立に追加",
+        "select_date": "日付選択",
+        "meal_time": "食事の時間",
+        "meal_types": {
+            "breakfast": "朝食",
+            "lunch": "昼食",
+            "dinner": "夕食"
+        },
+        "add_button": "追加する"
+    },
+    "auth_modal": {
+        "title": {
+            "login": "ログイン",
+            "signup": "会員登録",
+            "sync": "データ連携"
+        },
+        "placeholder": {
+            "email": "メールアドレス",
+            "password": "パスワード"
+        },
+        "button": {
+            "login": "ログイン",
+            "signup": "会員登録",
+            "kakao_login": "カカオログイン",
+            "kakao_signup": "カカオで登録",
+            "switch_to_signup": "アカウントをお持ちでないですか？ 会員登録",
+            "switch_to_login": "すでにアカウントをお持ちですか？ ログイン",
+            "forgot_password": "パスワードをお忘れですか？"
+        },
+        "info": {
+            "login_desc": "既存のアカウントでログインすると\\n保存されたレシピが表示されます。",
+            "login_sub": "この端末で作成したレシピはログアウトすると見えなくなります",
+            "signup_desc": "登録すると、この端末で作成したレシピが\\nアカウントに安全に保存されます。"
+        },
+        "sync": {
+            "title": "作成したレシピが{{count}}個あります！",
+            "description": "ログイン前に作成したレシピを\\n現在のアカウントに移行しますか？",
+            "confirm": "はい、アカウントに保存します",
+            "discard": "いいえ、削除してください",
+            "alert_title": "注意",
+            "alert_message": "ログイン前に作成したレシピは消えます。本当に削除しますか？",
+            "alert_confirm": "削除してログイン",
+            "success": "同期完了",
+            "success_detail": "{{count}}個のレシピを保存しました。"
+        },
+        "alert": {
+            "input_required": "メールアドレスとパスワードを入力してください。",
+            "signup_success": "登録完了！",
+            "welcome": "ようこそ！",
+            "signup_email_sent": "認証メールを送信しました。ご確認の上、ログインしてください。",
+            "login_failed_invalid": "アカウントがないか、パスワードが間違っています。",
+            "error_title": "エラー",
+            "error_request": "リクエストの処理に失敗しました。",
+            "apple_login_error": "Appleログイン中に問題が発生しました。",
+            "kakao_login_error": "カカオログイン中に問題が発生しました。",
+            "no_login_info": "ログイン情報がありません。",
+            "sync_error": "同期中に問題が発生しました。",
+            "input_email": "メールアドレスを入力してください。",
+            "feature_wip": "準備中の機能です。"
+        }
+    },
+    "meal": {
+        "title_current": "今週の献立",
+        "title_next": "来週の献立",
+        "type": {
+            "breakfast": "朝食",
+            "lunch": "昼食",
+            "dinner": "夕食"
+        },
+        "days": [
+            "日",
+            "月",
+            "火",
+            "水",
+            "木",
+            "金",
+            "土"
+        ],
+        "modal": {
+            "title": "メニュー入力",
+            "placeholder": "メニュー名を入力 (例: 味噌汁)",
+            "submit": "入力完了",
+            "or": "または",
+            "select_recipe": "レシピから選択"
+        },
+        "message": {
+            "added": "追加しました",
+            "save_failed": "保存に失敗しました",
+            "deleted": "削除しました",
+            "delete_failed": "削除に失敗しました"
+        }
+    },
+    "shopping": {
+        "title": "買い物リスト",
+        "placeholder": "買うものを入力 (例: 牛乳 2本)",
+        "empty": {
+            "text": "買い物リストは空です",
+            "subtext": "レシピから材料を追加するか\n直接入力してください"
+        },
+        "alert": {
+            "delete_title": "削除",
+            "delete_message": "この項目を削除しますか？",
+            "delete_confirm": "削除",
+            "reset_title": "リストを初期化",
+            "reset_message": "すべての項目を削除しますか？",
+            "reset_confirm": "すべて削除"
+        },
+        "message": {
+            "load_failed": "リストの読み込みに失敗しました",
+            "add_failed": "追加に失敗しました",
+            "reset_success": "リストを初期化しました",
+            "reset_failed": "初期化に失敗しました"
+        }
+    },
+    "settings": {
+        "title": "設定",
+        "user": {
+            "apple_user": "Apple ユーザー",
+            "user": "ユーザー",
+            "kakao_login": "カカオでログイン中",
+            "apple_login": "Appleでログイン中",
+            "logged_in": "ログイン中"
+        },
+        "login_card": {
+            "title": "ログイン",
+            "subtitle": "レシピを同期して\n他の端末でも利用できます"
+        },
+        "menu": {
+            "app_info": "アプリ情報",
+            "review": "レビューを書く",
+            "terms": "利用規約",
+            "logout": "ログアウト",
+            "delete_account": "退会する"
+        },
+        "alert": {
+            "logout_title": "ログアウト",
+            "logout_message": "ログアウトしますか？",
+            "delete_account_title": "退会",
+            "delete_account_message": "本当に退会しますか？\n作成したすべてのレシピが削除され、復元できません。",
+            "delete_confirm": "退会する",
+            "delete_success": "退会が完了しました。",
+            "delete_failed": "退会処理に失敗しました。もう一度お試しください。"
+        }
+    },
+    "recipe_form": {
+        "title": {
+            "new": "新しいレシピを追加",
+            "edit": "レシピを編集"
+        },
+        "label": {
+            "photo": "写真",
+            "add_photo": "写真を追加",
+            "title": "レシピのタイトル",
+            "title_placeholder": "例: ツナおにぎり",
+            "body": "レシピの内容",
+            "body_placeholder": "レシピの内容を入力するか、画像をアップロードしてください",
+            "expand_image": "画像を広げる",
+            "collapse_image": "画像を畳む",
+            "ai_analyzing": "AI分析中...",
+            "ai_analyze": "AIでレシピを読み込む",
+            "ai_description": "写真のレシピを整理し、材料のハッシュタグを追加します",
+            "add_image": "画像を追加",
+            "ingredient_tags": "材料別ハッシュタグ",
+            "ingredient_placeholder": "例: きゅうり, ツナ",
+            "add": "追加",
+            "situation_tags": "状況別ハッシュタグ",
+            "situation_placeholder": "例: 離乳食, 和食, 時短料理",
+            "memo": "コメント",
+            "memo_placeholder": "例: レシピ通りだと少し塩辛かった。次は塩を少なめに。",
+            "saving": "保存中...",
+            "save_button": "レシピを保存"
+        },
+        "alert": {
+            "permission_title": "権限が必要です",
+            "permission_message": "ギャラリーへのアクセス権限が必要です。",
+            "max_image": "画像は最大2枚までアップロードできます。",
+            "upload_first": "分析する画像を先にアップロードしてください。",
+            "analysis_failed": "画像の分析に失敗しました。",
+            "fetch_failed": "レシピを取得できませんでした。",
+            "analysis_success": "画像の分析が完了しました！",
+            "analysis_error": "画像の分析中にエラーが発生しました。",
+            "title_required": "レシピのタイトルを入力してください。",
+            "content_required": "レシピの内容を入力するか、画像をアップロードしてください。",
+            "save_failed": "レシピの保存に失敗しました。",
+            "update_failed": "レシピの編集に失敗しました。",
+            "save_error": "レシピの保存中にエラーが発生しました。"
+        }
+    },
+    "recipe_detail": {
+        "title": "レシピ",
+        "menu": {
+            "edit": "編集する",
+            "delete": "削除する"
+        },
+        "section": {
+            "comment": "コメント",
+            "ingredient": "材料",
+            "situation": "カテゴリー"
+        },
+        "button": {
+            "add_to_meal_plan": "献立に追加する"
+        },
+        "alert": {
+            "meal_added": "献立に追加しました",
+            "meal_add_failed": "献立への追加に失敗しました",
+            "delete_title": "レシピ削除",
+            "delete_message": "このレシピを削除しますか？",
+            "delete_failed": "レシピの削除に失敗しました",
+            "shop_add_title": "買い物リストに追加",
+            "shop_add_message": "「{{item}}」を買い物リストに追加しますか？",
+            "shop_added": "買い物リストに追加しました",
+            "shop_add_failed": "追加に失敗しました"
+        }
+    },
+    "recipe_selector": {
+        "search_placeholder": "レシピ検索...",
+        "close": "閉じる",
+        "empty": "レシピがありません"
+    },
+    "recipe_card": {
+        "untitled": "無題"
+    },
+    "recipe_detail_screen": {
+        "loading": "読み込み中...",
+        "not_found": "レシピが見つかりません",
+        "load_error": "レシピの読み込みに失敗しました"
+    },
+    "my_page": {
+        "title": "マイページ (準備中)"
+    }
+}

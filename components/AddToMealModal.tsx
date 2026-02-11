@@ -1,29 +1,31 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import { MealType } from '../types/meal_plan';
-import { format, addDays, startOfWeek } from 'date-fns';
-import { ko } from 'date-fns/locale';
-import { Ionicons } from '@expo/vector-icons';
+import { format, addDays } from 'date-fns';
+import { ko, enUS, ja } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
+import i18next from '../locales'; // Import global i18n instance
 
 interface AddToMealModalProps {
     visible: boolean;
     onClose: () => void;
-    onSave: (date: Date, mealType: MealType) => Promise<void>;
+    onSave: (date: Date, type: MealType) => Promise<void>;
     recipeTitle: string;
 }
 
 const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner'];
-const MEAL_TYPE_LABELS: Record<MealType, string> = {
-    breakfast: '아침',
-    lunch: '점심',
-    dinner: '저녁',
-};
 
 export function AddToMealModal({ visible, onClose, onSave, recipeTitle }: AddToMealModalProps) {
+    const { t, i18n } = useTranslation();
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [selectedMealType, setSelectedMealType] = useState<MealType>('dinner');
     const [saving, setSaving] = useState(false);
+
+    // Date-fns locale mapping
+    const dateLocales: Record<string, any> = { ko, en: enUS, ja };
+    const currentLocale = dateLocales[i18n.language] || ko;
 
     // Generate next 7 days
     const today = new Date();
@@ -33,6 +35,10 @@ export function AddToMealModal({ visible, onClose, onSave, recipeTitle }: AddToM
         setSaving(true);
         await onSave(selectedDate, selectedMealType);
         setSaving(false);
+    };
+
+    const getMealTypeLabel = (type: MealType) => {
+        return i18next.t(`add_to_meal.meal_types.${type}`);
     };
 
     return (
@@ -45,7 +51,7 @@ export function AddToMealModal({ visible, onClose, onSave, recipeTitle }: AddToM
             <Pressable style={styles.overlay} onPress={onClose}>
                 <Pressable style={styles.content} onPress={e => e.stopPropagation()}>
                     <View style={styles.header}>
-                        <Text style={styles.title}>식단에 추가하기</Text>
+                        <Text style={styles.title}>{i18next.t('add_to_meal.title')}</Text>
                         <TouchableOpacity onPress={onClose}>
                             <Ionicons name="close" size={24} color={Colors.text.primary} />
                         </TouchableOpacity>
@@ -54,7 +60,7 @@ export function AddToMealModal({ visible, onClose, onSave, recipeTitle }: AddToM
                     <Text style={styles.recipeTitle}>{recipeTitle}</Text>
 
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>날짜 선택</Text>
+                        <Text style={styles.sectionTitle}>{i18next.t('add_to_meal.select_date')}</Text>
                         <View style={styles.dateList}>
                             {nextDays.map(date => {
                                 const isSelected = format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
@@ -65,7 +71,7 @@ export function AddToMealModal({ visible, onClose, onSave, recipeTitle }: AddToM
                                         onPress={() => setSelectedDate(date)}
                                     >
                                         <Text style={[styles.dateChipText, isSelected && styles.dateChipTextSelected]}>
-                                            {format(date, 'M/d (EEE)', { locale: ko })}
+                                            {format(date, 'M/d (EEE)', { locale: currentLocale })}
                                         </Text>
                                     </TouchableOpacity>
                                 );
@@ -74,7 +80,7 @@ export function AddToMealModal({ visible, onClose, onSave, recipeTitle }: AddToM
                     </View>
 
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>식사 시간</Text>
+                        <Text style={styles.sectionTitle}>{i18next.t('add_to_meal.meal_time')}</Text>
                         <View style={styles.typeRow}>
                             {MEAL_TYPES.map(type => {
                                 const isSelected = selectedMealType === type;
@@ -85,7 +91,7 @@ export function AddToMealModal({ visible, onClose, onSave, recipeTitle }: AddToM
                                         onPress={() => setSelectedMealType(type)}
                                     >
                                         <Text style={[styles.typeButtonText, isSelected && styles.typeButtonTextSelected]}>
-                                            {MEAL_TYPE_LABELS[type]}
+                                            {getMealTypeLabel(type)}
                                         </Text>
                                     </TouchableOpacity>
                                 );
@@ -101,7 +107,7 @@ export function AddToMealModal({ visible, onClose, onSave, recipeTitle }: AddToM
                         {saving ? (
                             <ActivityIndicator color={Colors.white} />
                         ) : (
-                            <Text style={styles.saveButtonText}>추가하기</Text>
+                            <Text style={styles.saveButtonText}>{i18next.t('add_to_meal.add_button')}</Text>
                         )}
                     </TouchableOpacity>
                 </Pressable>

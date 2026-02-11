@@ -8,8 +8,10 @@ import { getGuestRecipes } from '../../utils/storage';
 import { supabase } from '../../utils/supabase/client';
 import { Colors } from '../../constants/Colors';
 import Toast from 'react-native-toast-message';
+import { useTranslation } from 'react-i18next';
 
 export default function RecipeDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,7 @@ export default function RecipeDetailScreen() {
       if (!fetchedRecipe) {
         Toast.show({
           type: 'error',
-          text1: '레시피를 찾을 수 없습니다',
+          text1: t('recipe_detail_screen.not_found'),
         });
         return;
       }
@@ -60,7 +62,7 @@ export default function RecipeDetailScreen() {
       console.error(err);
       Toast.show({
         type: 'error',
-        text1: '레시피를 불러오는데 실패했습니다',
+        text1: t('recipe_detail_screen.load_error'),
       });
     } finally {
       setLoading(false);
@@ -71,7 +73,7 @@ export default function RecipeDetailScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>로딩 중...</Text>
+        <Text style={styles.loadingText}>{t('recipe_detail_screen.loading')}</Text>
       </View>
     );
   }
@@ -79,7 +81,7 @@ export default function RecipeDetailScreen() {
   if (!recipe) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.errorText}>레시피를 찾을 수 없습니다</Text>
+        <Text style={styles.errorText}>{t('recipe_detail_screen.not_found')}</Text>
       </View>
     );
   }

@@ -1,0 +1,265 @@
+{
+    "tabs": {
+        "recipe": "레시피",
+        "meal": "식단",
+        "shopping": "장보기",
+        "settings": "설정"
+    },
+    "common": {
+        "ok": "확인",
+        "cancel": "취소",
+        "save": "저장",
+        "delete": "삭제",
+        "notice": "알림",
+        "error": "오류",
+        "warning": "주의",
+        "login_success": "로그인 성공",
+        "data_sync_start": "잠시 후 데이터 연동이 시작됩니다.",
+        "menu": "메뉴",
+        "add": "추가"
+    },
+    "home": {
+        "title": "RecipeBox",
+        "search_placeholder": "해시태그로 검색 (예: #한끼요리, #오이)",
+        "loading": "로딩 중...",
+        "empty": {
+            "title": "레시피가 없습니다",
+            "subtitle": "+ 버튼을 눌러 새 레시피를 추가해보세요"
+        },
+        "error": {
+            "load_failed": "레시피를 불러오는데 실패했습니다",
+            "delete_failed": "레시피 삭제에 실패했습니다"
+        }
+    },
+    "add_to_meal": {
+        "title": "식단에 추가하기",
+        "select_date": "날짜 선택",
+        "meal_time": "식사 시간",
+        "meal_types": {
+            "breakfast": "아침",
+            "lunch": "점심",
+            "dinner": "저녁"
+        },
+        "add_button": "추가하기"
+    },
+    "auth_modal": {
+        "title": {
+            "login": "로그인",
+            "signup": "회원가입",
+            "sync": "데이터 연동"
+        },
+        "placeholder": {
+            "email": "이메일",
+            "password": "비밀번호"
+        },
+        "button": {
+            "login": "로그인",
+            "signup": "회원가입",
+            "kakao_login": "카카오 로그인",
+            "kakao_signup": "카카오로 가입하기",
+            "switch_to_signup": "계정이 없으신가요? 회원가입",
+            "switch_to_login": "이미 계정이 있으신가요? 로그인",
+            "forgot_password": "비밀번호를 잊으셨나요?"
+        },
+        "info": {
+            "login_desc": "기존 계정으로 로그인하면\\n계정에 저장된 레시피가 표시됩니다.",
+            "login_sub": "이 기기에서 만든 레시피는 로그아웃하면 다시 볼 수 있어요",
+            "signup_desc": "가입하면 이 기기에서 만든 레시피가\\n계정에 안전하게 저장됩니다."
+        },
+        "sync": {
+            "title": "작성한 레시피가 {{count}}개 있어요!",
+            "description": "로그인 전 작성한 레시피를\\n현재 계정으로 옮겨올까요?",
+            "confirm": "네, 계정에 저장할래요",
+            "discard": "아니요, 삭제해주세요",
+            "alert_title": "주의",
+            "alert_message": "로그인 전에 만든 레시피는 사라져요. 정말 삭제할까요?",
+            "alert_confirm": "삭제하고 로그인",
+            "success": "동기화 완료",
+            "success_detail": "{{count}}개의 레시피를 저장했습니다."
+        },
+        "alert": {
+            "input_required": "이메일과 비밀번호를 입력해주세요.",
+            "signup_success": "가입 완료!",
+            "welcome": "환영합니다!",
+            "signup_email_sent": "이메일로 인증 메일을 보냈습니다. 확인 후 로그인해주세요.",
+            "login_failed_invalid": "계정이 없거나 비밀번호가 틀렸습니다.",
+            "error_title": "오류",
+            "error_request": "요청 처리에 실패했습니다.",
+            "apple_login_error": "Apple 로그인 중 문제가 발생했습니다.",
+            "kakao_login_error": "카카오 로그인 중 문제가 발생했습니다.",
+            "no_login_info": "로그인 정보가 없습니다.",
+            "sync_error": "동기화 중 문제가 발생했습니다.",
+            "input_email": "이메일을 입력해주세요.",
+            "feature_wip": "기능 준비중입니다."
+        }
+    },
+    "meal": {
+        "title_current": "이번 주 식단",
+        "title_next": "다음 주 식단",
+        "type": {
+            "breakfast": "아침",
+            "lunch": "점심",
+            "dinner": "저녁"
+        },
+        "days": [
+            "일",
+            "월",
+            "화",
+            "수",
+            "목",
+            "금",
+            "토"
+        ],
+        "modal": {
+            "title": "메뉴 입력",
+            "placeholder": "메뉴명을 입력하세요 (예: 김치찌개)",
+            "submit": "입력 완료",
+            "or": "또는",
+            "select_recipe": "레시피 중에 선택하기"
+        },
+        "message": {
+            "added": "추가됨",
+            "save_failed": "저장 실패",
+            "deleted": "삭제되었습니다",
+            "delete_failed": "삭제에 실패했습니다"
+        }
+    },
+    "shopping": {
+        "title": "장보기",
+        "placeholder": "살 것을 입력하세요 (예: 우유 2팩)",
+        "empty": {
+            "text": "장보기 목록이 비어있어요",
+            "subtext": "레시피에서 재료를 추가하거나\n직접 입력해보세요"
+        },
+        "alert": {
+            "delete_title": "삭제",
+            "delete_message": "이 항목을 삭제하시겠습니까?",
+            "delete_confirm": "삭제",
+            "reset_title": "장보기 목록 초기화",
+            "reset_message": "전체 목록을 삭제하시겠습니까?",
+            "reset_confirm": "전체 삭제"
+        },
+        "message": {
+            "load_failed": "리스트를 불러오지 못했습니다",
+            "add_failed": "추가 실패",
+            "reset_success": "목록이 초기화되었습니다",
+            "reset_failed": "초기화 실패"
+        }
+    },
+    "settings": {
+        "title": "설정",
+        "user": {
+            "apple_user": "Apple 사용자",
+            "user": "사용자",
+            "kakao_login": "카카오 로그인됨",
+            "apple_login": "Apple 로그인됨",
+            "logged_in": "로그인됨"
+        },
+        "login_card": {
+            "title": "로그인하기",
+            "subtitle": "지금까지 만든 레시피를 연동하고\n다른 기기에서도 사용할 수 있어요"
+        },
+        "menu": {
+            "app_info": "앱 정보",
+            "review": "리뷰 남기기",
+            "terms": "서비스 이용 약관",
+            "logout": "로그아웃",
+            "delete_account": "회원 탈퇴"
+        },
+        "alert": {
+            "logout_title": "로그아웃",
+            "logout_message": "로그아웃 하시겠습니까?",
+            "delete_account_title": "회원 탈퇴",
+            "delete_account_message": "정말 탈퇴하시겠습니까?\n작성한 모든 레시피가 삭제되며 복구할 수 없습니다.",
+            "delete_confirm": "탈퇴하기",
+            "delete_success": "회원 탈퇴가 완료되었습니다.",
+            "delete_failed": "탈퇴 처리에 실패했습니다. 다시 시도해주세요."
+        }
+    },
+    "recipe_form": {
+        "title": {
+            "new": "새 레시피 추가",
+            "edit": "레시피 수정"
+        },
+        "label": {
+            "photo": "사진",
+            "add_photo": "사진 추가하기",
+            "title": "레시피 제목",
+            "title_placeholder": "예: 참치김밥",
+            "body": "레시피 텍스트",
+            "body_placeholder": "레시피 내용을 입력하거나, 이미지를 업로드 해주세요",
+            "expand_image": "이미지 펼치기",
+            "collapse_image": "이미지 접기",
+            "ai_analyzing": "AI 분석 중...",
+            "ai_analyze": "AI로 레시피 가져오기",
+            "ai_description": "사진 속 레시피를 정리하고 재료 해시태그를 추가해드려요",
+            "add_image": "이미지 추가",
+            "ingredient_tags": "재료별 해시태그",
+            "ingredient_placeholder": "예: 오이, 참치",
+            "add": "추가",
+            "situation_tags": "상황별 해시태그",
+            "situation_placeholder": "예: 유아식, 한식, 한끼요리",
+            "memo": "코멘트",
+            "memo_placeholder": "예: 레시피대로 하니까 조금 짰음. 다음 번엔 소금 덜 넣기",
+            "saving": "저장 중...",
+            "save_button": "레시피 저장"
+        },
+        "alert": {
+            "permission_title": "권한 필요",
+            "permission_message": "갤러리 접근 권한이 필요합니다.",
+            "max_image": "이미지는 최대 2장까지 업로드할 수 있습니다",
+            "upload_first": "분석할 이미지를 먼저 업로드해주세요",
+            "analysis_failed": "이미지 분석에 실패했습니다",
+            "fetch_failed": "레시피를 가져오지 못했어요",
+            "analysis_success": "이미지 분석이 완료되었습니다!",
+            "analysis_error": "이미지 분석 중 오류가 발생했습니다",
+            "title_required": "레시피 제목을 입력해주세요",
+            "content_required": "레시피 내용을 입력하거나 이미지를 업로드해주세요",
+            "save_failed": "레시피 저장에 실패했습니다",
+            "update_failed": "레시피 수정에 실패했습니다",
+            "save_error": "레시피 저장 중 오류가 발생했습니다"
+        }
+    },
+    "recipe_detail": {
+        "title": "레시피",
+        "menu": {
+            "edit": "수정하기",
+            "delete": "삭제하기"
+        },
+        "section": {
+            "comment": "코멘트",
+            "ingredient": "재료",
+            "situation": "상황"
+        },
+        "button": {
+            "add_to_meal_plan": "식단에 추가하기"
+        },
+        "alert": {
+            "meal_added": "식단에 추가되었습니다",
+            "meal_add_failed": "식단 추가에 실패했습니다",
+            "delete_title": "레시피 삭제",
+            "delete_message": "이 레시피를 삭제하시겠습니까?",
+            "delete_failed": "레시피 삭제에 실패했습니다",
+            "shop_add_title": "장보기 목록 추가",
+            "shop_add_message": "'{{item}}'을(를) 장보기 목록에 추가하시겠습니까?",
+            "shop_added": "장보기 목록에 추가되었습니다",
+            "shop_add_failed": "추가 실패"
+        }
+    },
+    "recipe_selector": {
+        "search_placeholder": "레시피 검색...",
+        "close": "닫기",
+        "empty": "레시피가 없습니다"
+    },
+    "recipe_card": {
+        "untitled": "제목 없음"
+    },
+    "recipe_detail_screen": {
+        "loading": "로딩 중...",
+        "not_found": "레시피를 찾을 수 없습니다",
+        "load_error": "레시피를 불러오는데 실패했습니다"
+    },
+    "my_page": {
+        "title": "MY 페이지 (나중에 구현)"
+    }
+}

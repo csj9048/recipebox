@@ -12,23 +12,22 @@ import { Recipe } from '../../types/recipe';
 import { useRouter } from 'expo-router';
 import analytics from '@react-native-firebase/analytics';
 import { getGuestMealPlans, addGuestMealPlan, deleteGuestMealPlan } from '../../utils/storage';
+import { useTranslation } from 'react-i18next';
+import i18next from '../../locales'; // Import global i18n instance
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const LABEL_WIDTH = 50;
 const MEAL_COL_WIDTH = (SCREEN_WIDTH - 32 - LABEL_WIDTH) / 3;
 
 const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner'];
-const MEAL_TYPE_LABELS: Record<MealType, string> = {
-  breakfast: '아침',
-  lunch: '점심',
-  dinner: '저녁',
-};
-
-const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
 
 export default function MealScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+  // Safe translation helper
+  const safeT = (key: string, options?: any) => i18next.t(key, options);
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
@@ -38,7 +37,7 @@ export default function MealScreen() {
 
   const [entryModalVisible, setEntryModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [recipeSelectorVisible, setRecipeSelectorVisible] = useState(false);
+  // recipeSelectorVisible seems unused in original file, but I'll check if I need it. Original used modalVisible for RecipeSelector.
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedMealType, setSelectedMealType] = useState<MealType | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -48,6 +47,8 @@ export default function MealScreen() {
   const isCurrentWeek = isSameDay(viewingWeekStart, currentWeekStart);
   const nextWeekStart = addDays(currentWeekStart, 7);
   const isNextWeek = isSameDay(viewingWeekStart, nextWeekStart);
+
+  const dayNames = t('meal.days', { returnObjects: true }) as string[];
 
   const fetchMealPlans = useCallback(async () => {
     try {
@@ -122,7 +123,7 @@ export default function MealScreen() {
         if (error) throw error;
       }
 
-      // Toast.show({ type: 'success', text1: '추가됨' });
+      // Toast.show({ type: 'success', text1: t('meal.message.added') });
       setEntryModalVisible(false);
       fetchMealPlans();
       await analytics().logEvent('menu_added', {
@@ -131,7 +132,7 @@ export default function MealScreen() {
       });
     } catch (error) {
       console.error(error);
-      Toast.show({ type: 'error', text1: '저장 실패' });
+      Toast.show({ type: 'error', text1: t('meal.message.save_failed') });
     } finally {
       setSaving(false);
     }
@@ -150,11 +151,11 @@ export default function MealScreen() {
         const { error } = await supabase.from('meal_plans').delete().eq('id', id);
         if (error) throw error;
       }
-      // Toast.show({ type: 'success', text1: '삭제되었습니다' });
+      // Toast.show({ type: 'success', text1: t('meal.message.deleted') });
       fetchMealPlans();
     } catch (error) {
       console.error('Error deleting meal:', error);
-      Toast.show({ type: 'error', text1: '삭제에 실패했습니다' });
+      Toast.show({ type: 'error', text1: t('meal.message.delete_failed') });
     }
   };
 
@@ -186,7 +187,7 @@ export default function MealScreen() {
           </TouchableOpacity>
 
           <Text style={{ fontSize: 12, color: 'black', fontWeight: 'bold', textAlign: 'center' }} numberOfLines={3}>
-            {plan.recipes?.title || plan.custom_text || '메뉴'}
+            {plan.recipes?.title || plan.custom_text || t('common.menu')}
           </Text>
         </TouchableOpacity>
       );
@@ -214,7 +215,7 @@ export default function MealScreen() {
           )}
         </View>
 
-        <Text style={styles.headerTitle}>{isCurrentWeek ? '이번 주 식단' : '다음 주 식단'}</Text>
+        <Text style={styles.headerTitle}>{isCurrentWeek ? t('meal.title_current') : t('meal.title_next')}</Text>
 
         <View style={styles.headerButton}>
           {!isNextWeek && (
@@ -236,14 +237,14 @@ export default function MealScreen() {
             <View style={{ width: LABEL_WIDTH, borderRightWidth: 1, borderColor: '#ddd', height: 40 }} />
             {MEAL_TYPES.map(type => (
               <View key={type} style={{ width: MEAL_COL_WIDTH, height: 40, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderColor: '#ddd' }}>
-                <Text style={{ fontSize: 14, fontWeight: 'bold', color: 'black' }}>{MEAL_TYPE_LABELS[type]}</Text>
+                <Text style={{ fontSize: 14, fontWeight: 'bold', color: 'black' }}>{t(`meal.type.${type}`)}</Text>
               </View>
             ))}
           </View>
 
           {/* Body */}
           {weekDays.map((date, index) => {
-            const dayName = DAY_NAMES[date.getDay()];
+            const dayName = dayNames[date.getDay()];
             const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
             return (
@@ -311,7 +312,7 @@ export default function MealScreen() {
                 if (error) throw error;
               }
 
-              // Toast.show({ type: 'success', text1: '추가됨' });
+              // Toast.show({ type: 'success', text1: t('meal.message.added') });
               setModalVisible(false);
               fetchMealPlans();
               await analytics().logEvent('menu_added', {
@@ -343,7 +344,7 @@ export default function MealScreen() {
         >
           <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 20 }} onStartShouldSetResponder={() => true}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>메뉴 입력</Text>
+              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{safeT('meal.modal.title')}</Text>
               <TouchableOpacity onPress={() => setEntryModalVisible(false)}>
                 <Ionicons name="close" size={24} color={Colors.gray[400]} />
               </TouchableOpacity>
@@ -358,7 +359,7 @@ export default function MealScreen() {
                 fontSize: 16,
                 marginBottom: 16
               }}
-              placeholder="메뉴명을 입력하세요 (예: 김치찌개)"
+              placeholder={safeT('meal.modal.placeholder')}
               value={customText}
               onChangeText={setCustomText}
               autoFocus
@@ -374,12 +375,12 @@ export default function MealScreen() {
               }}
               onPress={handleSaveCustomMeal}
             >
-              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>입력 완료</Text>
+              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>{safeT('meal.modal.submit')}</Text>
             </TouchableOpacity>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
               <View style={{ flex: 1, height: 1, backgroundColor: Colors.border.light }} />
-              <Text style={{ marginHorizontal: 8, color: Colors.gray[400], fontSize: 12 }}>또는</Text>
+              <Text style={{ marginHorizontal: 8, color: Colors.gray[400], fontSize: 12 }}>{safeT('meal.modal.or')}</Text>
               <View style={{ flex: 1, height: 1, backgroundColor: Colors.border.light }} />
             </View>
 
@@ -399,7 +400,7 @@ export default function MealScreen() {
               }}
             >
               <Ionicons name="book-outline" size={20} color="black" />
-              <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16 }}>레시피 중에 선택하기</Text>
+              <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16 }}>{safeT('meal.modal.select_recipe')}</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>

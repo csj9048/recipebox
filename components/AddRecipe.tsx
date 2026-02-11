@@ -14,10 +14,12 @@ import Toast from 'react-native-toast-message';
 import { saveGuestRecipe, updateGuestRecipe, getGuestRecipes } from '../utils/storage';
 import { convertImageToBase64, uploadImage } from '../utils/image';
 import analytics from '@react-native-firebase/analytics';
+import { useTranslation } from 'react-i18next';
 
 export function AddRecipe() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const params = useLocalSearchParams<{ id?: string }>();
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [title, setTitle] = useState('');
@@ -97,7 +99,7 @@ export function AddRecipe() {
       console.error(err);
       Toast.show({
         type: 'error',
-        text1: '레시피를 불러오는데 실패했습니다',
+        text1: t('recipe_form.alert.fetch_failed'),
       });
     }
   };
@@ -105,7 +107,7 @@ export function AddRecipe() {
   const pickThumbnail = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('권한 필요', '갤러리 접근 권한이 필요합니다.');
+      Alert.alert(t('recipe_form.alert.permission_title'), t('recipe_form.alert.permission_message'));
       return;
     }
 
@@ -125,7 +127,7 @@ export function AddRecipe() {
   const pickExtractionImages = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('권한 필요', '갤러리 접근 권한이 필요합니다.');
+      Alert.alert(t('recipe_form.alert.permission_title'), t('recipe_form.alert.permission_message'));
       return;
     }
 
@@ -133,7 +135,7 @@ export function AddRecipe() {
     if (totalCount >= 2) {
       Toast.show({
         type: 'error',
-        text1: '이미지는 최대 2장까지 업로드할 수 있습니다',
+        text1: t('recipe_form.alert.max_image'),
       });
       return;
     }
@@ -171,7 +173,7 @@ export function AddRecipe() {
     if (extractionImageUris.length === 0) {
       Toast.show({
         type: 'error',
-        text1: '분석할 이미지를 먼저 업로드해주세요',
+        text1: t('recipe_form.alert.upload_first'),
       });
       return;
     }
@@ -202,7 +204,7 @@ export function AddRecipe() {
         console.error('Image analysis error:', errorData);
         Toast.show({
           type: 'error',
-          text1: '이미지 분석에 실패했습니다',
+          text1: t('recipe_form.alert.analysis_failed'),
         });
         return;
       }
@@ -212,7 +214,7 @@ export function AddRecipe() {
       if (data.error) {
         Toast.show({
           type: 'error',
-          text1: '레시피를 가져오지 못했어요',
+          text1: t('recipe_form.alert.fetch_failed'),
         });
         return;
       }
@@ -227,13 +229,13 @@ export function AddRecipe() {
       setImageCollapsed(true);
       Toast.show({
         type: 'success',
-        text1: '이미지 분석이 완료되었습니다!',
+        text1: t('recipe_form.alert.analysis_success'),
       });
     } catch (error) {
       console.error('Error analyzing image:', error);
       Toast.show({
         type: 'error',
-        text1: '이미지 분석 중 오류가 발생했습니다',
+        text1: t('recipe_form.alert.analysis_error'),
       });
     } finally {
       setAnalyzing(false);
@@ -269,7 +271,7 @@ export function AddRecipe() {
     if (!title.trim()) {
       Toast.show({
         type: 'error',
-        text1: '레시피 제목을 입력해주세요',
+        text1: t('recipe_form.alert.title_required'),
       });
       return;
     }
@@ -277,7 +279,7 @@ export function AddRecipe() {
     if (!bodyText.trim() && extractionImageUris.length === 0) {
       Toast.show({
         type: 'error',
-        text1: '레시피 내용을 입력하거나 이미지를 업로드해주세요',
+        text1: t('recipe_form.alert.content_required'),
       });
       return;
     }
@@ -423,7 +425,7 @@ export function AddRecipe() {
           console.error('Error updating recipe:', error);
           Toast.show({
             type: 'error',
-            text1: '레시피 수정에 실패했습니다',
+            text1: t('recipe_form.alert.update_failed'),
           });
           return;
         }
@@ -454,7 +456,7 @@ export function AddRecipe() {
           console.error('Error creating recipe:', error);
           Toast.show({
             type: 'error',
-            text1: '레시피 저장에 실패했습니다',
+            text1: t('recipe_form.alert.save_failed'),
           });
           return;
         }
@@ -470,7 +472,7 @@ export function AddRecipe() {
       console.error('Error saving recipe:', err);
       Toast.show({
         type: 'error',
-        text1: err instanceof Error ? err.message : '레시피 저장 중 오류가 발생했습니다',
+        text1: err instanceof Error ? err.message : t('recipe_form.alert.save_error'),
       });
     } finally {
       setSaving(false);
@@ -485,7 +487,7 @@ export function AddRecipe() {
           <Ionicons name="chevron-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {editingRecipe ? '레시피 수정' : '새 레시피 추가'}
+          {editingRecipe ? t('recipe_form.title.edit') : t('recipe_form.title.new')}
         </Text>
         <View style={styles.headerButton} />
       </View>
@@ -493,7 +495,7 @@ export function AddRecipe() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Thumbnail */}
         <View style={styles.section}>
-          <Text style={styles.label}>사진</Text>
+          <Text style={styles.label}>{t('recipe_form.label.photo')}</Text>
           {thumbnailUri ? (
             <View style={styles.thumbnailContainer}>
               <Image source={{ uri: thumbnailUri }} style={styles.thumbnail} contentFit="contain" />
@@ -510,31 +512,31 @@ export function AddRecipe() {
           ) : (
             <TouchableOpacity onPress={pickThumbnail} style={styles.imagePickerButton}>
               <Ionicons name="camera" size={32} color={Colors.gray[400]} />
-              <Text style={styles.imagePickerText}>사진 추가하기</Text>
+              <Text style={styles.imagePickerText}>{t('recipe_form.label.add_photo')}</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {/* Title */}
         <View style={styles.section}>
-          <Text style={styles.label}>레시피 제목</Text>
+          <Text style={styles.label}>{t('recipe_form.label.title')}</Text>
           <TextInput
             style={styles.input}
             value={title}
             onChangeText={setTitle}
-            placeholder="예: 참치김밥"
+            placeholder={t('recipe_form.label.title_placeholder')}
             placeholderTextColor={Colors.gray[400]}
           />
         </View>
 
         {/* Body Text */}
         <View style={styles.section}>
-          <Text style={styles.label}>레시피 텍스트</Text>
+          <Text style={styles.label}>{t('recipe_form.label.body')}</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={bodyText}
             onChangeText={setBodyText}
-            placeholder="레시피 내용을 입력하거나, 이미지를 업로드 해주세요"
+            placeholder={t('recipe_form.label.body_placeholder')}
             placeholderTextColor={Colors.gray[400]}
             multiline
             numberOfLines={8}
@@ -549,7 +551,7 @@ export function AddRecipe() {
                   onPress={() => setImageCollapsed(false)}
                   style={styles.collapseButton}
                 >
-                  <Text style={styles.collapseButtonText}>이미지 펼치기</Text>
+                  <Text style={styles.collapseButtonText}>{t('recipe_form.label.expand_image')}</Text>
                 </TouchableOpacity>
               ) : (
                 <>
@@ -601,7 +603,7 @@ export function AddRecipe() {
                         onPress={() => setImageCollapsed(true)}
                         style={styles.collapseButtonBottom}
                       >
-                        <Text style={styles.collapseButtonText}>이미지 접기</Text>
+                        <Text style={styles.collapseButtonText}>{t('recipe_form.label.collapse_image')}</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -620,11 +622,11 @@ export function AddRecipe() {
                         <Ionicons name="sparkles" size={18} color={Colors.text.primary} />
                       )}
                       <Text style={styles.analyzeButtonText}>
-                        {analyzing ? 'AI 분석 중...' : 'AI로 레시피 가져오기'}
+                        {analyzing ? t('recipe_form.label.ai_analyzing') : t('recipe_form.label.ai_analyze')}
                       </Text>
                     </View>
                     <Text style={{ fontSize: 12, color: Colors.gray[600], textAlign: 'center' }}>
-                      사진 속 레시피를 정리하고 재료 해시태그를 추가해드려요
+                      {t('recipe_form.label.ai_description')}
                     </Text>
                   </TouchableOpacity>
                 </>
@@ -635,25 +637,25 @@ export function AddRecipe() {
           {extractionImageUris.length < 2 && (
             <TouchableOpacity onPress={pickExtractionImages} style={styles.addImageButton}>
               <Ionicons name="add" size={20} color={Colors.primary} />
-              <Text style={styles.addImageButtonText}>이미지 추가</Text>
+              <Text style={styles.addImageButtonText}>{t('recipe_form.label.add_image')}</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {/* Ingredient Tags */}
         <View style={styles.section}>
-          <Text style={styles.label}>재료별 해시태그</Text>
+          <Text style={styles.label}>{t('recipe_form.label.ingredient_tags')}</Text>
           <View style={styles.tagInputRow}>
             <TextInput
               style={[styles.input, styles.tagInput]}
               value={ingredientTagInput}
               onChangeText={setIngredientTagInput}
-              placeholder="예: 오이, 참치"
+              placeholder={t('recipe_form.label.ingredient_placeholder')}
               placeholderTextColor={Colors.gray[400]}
               onSubmitEditing={handleAddIngredientTag}
             />
             <TouchableOpacity onPress={handleAddIngredientTag} style={styles.addTagButton}>
-              <Text style={styles.addTagButtonText}>추가</Text>
+              <Text style={styles.addTagButtonText}>{t('recipe_form.label.add')}</Text>
             </TouchableOpacity>
           </View>
           {ingredientTags.length > 0 && (
@@ -672,18 +674,18 @@ export function AddRecipe() {
 
         {/* Situation Tags */}
         <View style={styles.section}>
-          <Text style={styles.label}>상황별 해시태그</Text>
+          <Text style={styles.label}>{t('recipe_form.label.situation_tags')}</Text>
           <View style={styles.tagInputRow}>
             <TextInput
               style={[styles.input, styles.tagInput]}
               value={situationTagInput}
               onChangeText={setSituationTagInput}
-              placeholder="예: 유아식, 한식, 한끼요리"
+              placeholder={t('recipe_form.label.situation_placeholder')}
               placeholderTextColor={Colors.gray[400]}
               onSubmitEditing={handleAddSituationTag}
             />
             <TouchableOpacity onPress={handleAddSituationTag} style={styles.addTagButton}>
-              <Text style={styles.addTagButtonText}>추가</Text>
+              <Text style={styles.addTagButtonText}>{t('recipe_form.label.add')}</Text>
             </TouchableOpacity>
           </View>
           {situationTags.length > 0 && (
@@ -702,12 +704,12 @@ export function AddRecipe() {
 
         {/* Memo */}
         <View style={styles.section}>
-          <Text style={styles.label}>코멘트</Text>
+          <Text style={styles.label}>{t('recipe_form.label.memo')}</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
             value={memo}
             onChangeText={setMemo}
-            placeholder="예: 레시피대로 하니까 조금 짰음. 다음 번엔 소금 덜 넣기"
+            placeholder={t('recipe_form.label.memo_placeholder')}
             placeholderTextColor={Colors.gray[400]}
             multiline
             numberOfLines={2}
@@ -728,11 +730,11 @@ export function AddRecipe() {
               <Ionicons name="cloud-upload-outline" size={20} color={Colors.text.primary} />
             )}
             <Text style={styles.submitButtonText}>
-              {saving ? '저장 중...' : '레시피 저장'}
+              {saving ? t('recipe_form.label.saving') : t('recipe_form.label.save_button')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.back()} style={styles.cancelButton}>
-            <Text style={styles.cancelButtonText}>취소</Text>
+            <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

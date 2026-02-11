@@ -5,17 +5,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AdBanner } from '../../components/AdBanner';
 
+import { useTranslation } from 'react-i18next';
+
 export default function TabsLayout() {
   const pathname = usePathname();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const tabs = [
-    { name: '레시피', route: '/', icon: 'restaurant' },
-    { name: '식단', route: '/meal', icon: 'calendar' },
+    { name: t('tabs.recipe'), route: '/', icon: 'restaurant' },
+    { name: t('tabs.meal'), route: '/meal', icon: 'calendar' },
     { name: '', route: '/add', icon: 'add-circle' },
-    { name: '장보기', route: '/shopping', icon: 'cart' },
-    { name: '설정', route: '/settings', icon: 'settings' },
+    { name: t('tabs.shopping'), route: '/shopping', icon: 'cart' },
+    { name: t('tabs.settings'), route: '/settings', icon: 'settings' },
   ];
 
   return (

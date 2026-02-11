@@ -8,6 +8,7 @@ import { Colors } from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import analytics from '@react-native-firebase/analytics';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getGuestRecipes, deleteGuestRecipe } from '../utils/storage';
 
@@ -17,6 +18,7 @@ export function RecipeList() {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   useFocusEffect(
     useCallback(() => {
@@ -49,7 +51,7 @@ export function RecipeList() {
         console.error(error);
         Toast.show({
           type: 'error',
-          text1: '레시피를 불러오는데 실패했습니다',
+          text1: t('home.error.load_failed'),
         });
         return;
       }
@@ -59,7 +61,7 @@ export function RecipeList() {
       console.error(err);
       Toast.show({
         type: 'error',
-        text1: '레시피를 불러오는데 실패했습니다',
+        text1: t('home.error.load_failed'),
       });
     } finally {
       setLoading(false);
@@ -89,7 +91,7 @@ export function RecipeList() {
       console.error(err);
       Toast.show({
         type: 'error',
-        text1: '레시피 삭제에 실패했습니다',
+        text1: t('home.error.delete_failed'),
       });
     }
   };
@@ -121,7 +123,7 @@ export function RecipeList() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>로딩 중...</Text>
+        <Text style={styles.loadingText}>{t('home.loading')}</Text>
       </View>
     );
   }
@@ -131,7 +133,7 @@ export function RecipeList() {
       {/* 헤더 */}
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>RecipeBox</Text>
+          <Text style={styles.headerTitle}>{t('home.title')}</Text>
         </View>
 
         {/* 검색바 */}
@@ -139,7 +141,7 @@ export function RecipeList() {
           <Ionicons name="search" size={20} color={Colors.gray[400]} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="해시태그로 검색 (예: #한끼요리, #오이)"
+            placeholder={t('home.search_placeholder')}
             placeholderTextColor={Colors.gray[400]}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -160,9 +162,9 @@ export function RecipeList() {
           <View style={styles.emptyIconContainer}>
             <Ionicons name="restaurant-outline" size={48} color={Colors.gray[400]} />
           </View>
-          <Text style={styles.emptyText}>레시피가 없습니다</Text>
+          <Text style={styles.emptyText}>{t('home.empty.title')}</Text>
           <Text style={styles.emptySubtext}>
-            + 버튼을 눌러 새 레시피를 추가해보세요
+            {t('home.empty.subtitle')}
           </Text>
         </View>
       ) : (
