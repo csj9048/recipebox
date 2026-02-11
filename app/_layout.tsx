@@ -177,14 +177,15 @@ export default function RootLayout() {
     });
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+      // Only check for guest recipes on initial session load (startup)
+      // On regular login (SIGNED_IN), the AuthModal instance that handled the login will handle the sync check.
+      if (event === 'INITIAL_SESSION' && session?.user) {
         const guestRecipes = await getGuestRecipes();
         if (guestRecipes.length > 0) setAuthModalVisible(true);
-        if (event === 'SIGNED_IN') {
-          await analytics().logLogin({ method: session.user.app_metadata.provider || 'email' });
-        }
-      } else if (event === 'SIGNED_OUT') {
-        // Ensure UI updates if needed
+      }
+
+      if (event === 'SIGNED_IN' && session?.user) {
+        await analytics().logLogin({ method: session.user.app_metadata.provider || 'email' });
       }
     });
     Linking.getInitialURL().then((url) => { if (url) handleDeepLink(url); });
