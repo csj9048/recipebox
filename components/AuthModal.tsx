@@ -50,7 +50,8 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
 
     useEffect(() => {
         GoogleSignin.configure({
-            webClientId: '588369078442-ton21hl0rb8e62a9rq4e6mul3inktuer.apps.googleusercontent.com',
+            webClientId: '189700867975-0b4furd1tetrr0l4dh8sj80m2jgag4um.apps.googleusercontent.com',
+            // iOS Client ID will need to be updated after downloading fresh GoogleService-Info.plist
             iosClientId: '588369078442-vm7nslq771fr0ioui5t0hefk6bvmsivo.apps.googleusercontent.com',
             offlineAccess: true,
         });
