@@ -49,11 +49,13 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
     }, [visible]);
 
     useEffect(() => {
-        GoogleSignin.configure({
-            scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-            webClientId: '588369078442-ton21hl0rb8e62a9rq4e6mul3inktuer.apps.googleusercontent.com',
-            iosClientId: '588369078442-vm7nslq771fr0ioui5t0hefk6bvmsivo.apps.googleusercontent.com',
-        });
+        useEffect(() => {
+            GoogleSignin.configure({
+                webClientId: '588369078442-ton21hl0rb8e62a9rq4e6mul3inktuer.apps.googleusercontent.com',
+                iosClientId: '588369078442-vm7nslq771fr0ioui5t0hefk6bvmsivo.apps.googleusercontent.com',
+                offlineAccess: true,
+            });
+        }, []);
     }, []);
 
     const initializeModal = async () => {
@@ -314,12 +316,15 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
         setLoading(true);
         try {
             await GoogleSignin.hasPlayServices();
-            const userInfo = await GoogleSignin.signIn();
+            const response = await GoogleSignin.signIn();
 
-            if (userInfo.idToken) {
+            // Check both potential locations for idToken (v13+ uses data.idToken)
+            const idToken = response.data?.idToken || response.idToken;
+
+            if (idToken) {
                 const { data, error } = await supabase.auth.signInWithIdToken({
                     provider: 'google',
-                    token: userInfo.idToken,
+                    token: idToken,
                 });
                 console.log(error, data);
 
@@ -327,6 +332,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                 // onSuccess will be triggered by onAuthStateChange in RootLayout
                 onSuccess?.();
             } else {
+                console.error('Google Sign-In Response:', JSON.stringify(response, null, 2));
                 throw new Error('no ID token present!');
             }
         } catch (error: any) {
