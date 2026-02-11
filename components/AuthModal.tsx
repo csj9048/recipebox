@@ -535,42 +535,6 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
-                                    style={[styles.socialButton, { backgroundColor: '#FEE500' }]}
-                                    onPress={handleKakaoLogin}
-                                    disabled={loading}
-                                >
-                                    <Ionicons name="chatbubble" size={20} color="#000000" />
-                                    <Text style={[styles.socialButtonText, { color: '#000000' }]}>
-                                        {isLogin ? safeT('auth_modal.button.kakao_login') : safeT('auth_modal.button.kakao_signup')}
-                                    </Text>
-                                </TouchableOpacity>
-
-                                {appleAuthAvailable && (
-                                    <AppleAuthentication.AppleAuthenticationButton
-                                        buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-                                        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                                        cornerRadius={12}
-                                        style={styles.appleButton}
-                                        onPress={onAppleLogin}
-                                    />
-                                )}
-
-                                <TouchableOpacity
-                                    style={[styles.socialButton, { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DDDDDD' }]}
-                                    onPress={handleGoogleLogin}
-                                    disabled={loading}
-                                >
-                                    <Image
-                                        source={require('../assets/google-logo.png')}
-                                        style={{ width: 20, height: 20 }}
-                                        contentFit="contain"
-                                    />
-                                    <Text style={[styles.socialButtonText, { color: '#000000' }]}>
-                                        Google로 계속하기
-                                    </Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
                                     style={styles.switchButton}
                                     onPress={() => setIsLogin(!isLogin)}
                                 >
@@ -578,6 +542,49 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                         {isLogin ? safeT('auth_modal.button.switch_to_signup') : safeT('auth_modal.button.switch_to_login')}
                                     </Text>
                                 </TouchableOpacity>
+
+                                {/* Divider */}
+                                <View style={styles.dividerContainer}>
+                                    <View style={styles.dividerLine} />
+                                    <Text style={styles.dividerText}>OR</Text>
+                                    <View style={styles.dividerLine} />
+                                </View>
+
+                                {/* Social Login Buttons Row */}
+                                <View style={styles.socialContainer}>
+                                    {/* Kakao */}
+                                    <TouchableOpacity
+                                        style={[styles.socialButtonCircle, { backgroundColor: '#FEE500' }]}
+                                        onPress={handleKakaoLogin}
+                                        disabled={loading}
+                                    >
+                                        <Ionicons name="chatbubble" size={24} color="#000000" />
+                                    </TouchableOpacity>
+
+                                    {/* Apple */}
+                                    {appleAuthAvailable && (
+                                        <TouchableOpacity
+                                            style={[styles.socialButtonCircle, { backgroundColor: '#000000' }]}
+                                            onPress={onAppleLogin}
+                                            disabled={loading}
+                                        >
+                                            <Ionicons name="logo-apple" size={24} color="#FFFFFF" />
+                                        </TouchableOpacity>
+                                    )}
+
+                                    {/* Google */}
+                                    <TouchableOpacity
+                                        style={[styles.socialButtonCircle, { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DDDDDD' }]}
+                                        onPress={handleGoogleLogin}
+                                        disabled={loading}
+                                    >
+                                        <Image
+                                            source={require('../assets/google-logo.png')}
+                                            style={{ width: 24, height: 24 }}
+                                            contentFit="contain"
+                                        />
+                                    </TouchableOpacity>
+                                </View>
 
                                 {isLogin && (
                                     <TouchableOpacity
@@ -686,23 +693,24 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
     },
-    socialButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 4,
-        gap: 8,
-    },
-    socialButtonText: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    appleButton: {
-        width: '100%',
+    socialButtonCircle: {
+        width: 50,
         height: 50,
-        marginBottom: 8,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        // Shadow for elevation
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 3,
+            },
+        }),
     },
     switchButton: {
         alignItems: 'center',
@@ -735,6 +743,30 @@ const styles = StyleSheet.create({
         color: Colors.gray[400],
         fontSize: 13,
         textDecorationLine: 'underline',
+    },
+    /* Divider Styles */
+    dividerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 20,
+    },
+    dividerLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: Colors.gray[200],
+    },
+    dividerText: {
+        marginHorizontal: 12,
+        color: Colors.gray[400],
+        fontSize: 12,
+        fontWeight: '500',
+    },
+    /* Social Container */
+    socialContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 20,
+        marginBottom: 10,
     },
     /* Sync View Styles */
     syncContainer: {
