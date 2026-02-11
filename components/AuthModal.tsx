@@ -262,6 +262,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                     skipBrowserRedirect: true,
                     queryParams: {
                         scope: 'profile_nickname,profile_image',
+                        prompt: 'login', // Force login screen to allow account switching
                     },
                 },
             });
