@@ -63,7 +63,7 @@
         },
         "info": {
             "login_desc": "Log in to keep your recipes safe.",
-            "signup_desc": "Sign up to safely save recipes\\ncreated on this device to your account."
+            "signup_desc": "Create an account to keep your recipes safe."
         },
         "sync": {
             "title": "You have {{count}} recipes!",
