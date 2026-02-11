@@ -231,7 +231,7 @@ export default function ShoppingScreen() {
             style={[styles.iconButton, { backgroundColor: '#E6F0FD' }]}
             onPress={() => handleCoupangSearch(item.text)}
           >
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#AE0000' }}>C</Text>
+            <Ionicons name="cart-outline" size={20} color="#AE0000" />
           </TouchableOpacity>
         )}
 
@@ -274,7 +274,7 @@ export default function ShoppingScreen() {
         data={sortedItems}
         renderItem={renderItem}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, isKorea && { paddingBottom: 60 }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
@@ -284,12 +284,41 @@ export default function ShoppingScreen() {
           </View>
         }
       />
+
+      {/* Coupang Partners Disclaimer (KR only) */}
+      {isKorea && (
+        <View style={styles.disclaimerContainer}>
+          <Text style={styles.disclaimerText}>
+            장바구니 링크를 통해 구매하시면 쿠팡 파트너스 활동을 통해{'\n'}서비스 운영에 도움이 되는 소정의 수수료를 제공받습니다.
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
+  // ... existing styles ...
+  disclaimerContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border.light,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  disclaimerText: {
+    fontSize: 10,
+    color: Colors.gray[500],
+    textAlign: 'center',
+    lineHeight: 14,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
