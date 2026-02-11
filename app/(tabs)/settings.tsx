@@ -13,6 +13,8 @@ import { projectId, publicAnonKey } from '../../utils/supabase/info';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
 export default function SettingsScreen() {
     const insets = useSafeAreaInsets();
     const { t } = useTranslation();
@@ -47,6 +49,11 @@ export default function SettingsScreen() {
                 text: t('settings.menu.logout'),
                 style: 'destructive',
                 onPress: async () => {
+                    try {
+                        await GoogleSignin.signOut();
+                    } catch (e) {
+                        console.log('Google Sign-Out Error (ignore if not logged in via Google):', e);
+                    }
                     await supabase.auth.signOut();
                     setUser(null);
                 },
