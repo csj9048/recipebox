@@ -26,7 +26,7 @@ WebBrowser.maybeCompleteAuthSession();
 export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth' }: AuthModalProps) {
     const { t } = useTranslation();
     // Helper to use global i18n for Modal content to avoid context loss issues
-    const safeT = (key: string, options?: any) => i18next.t(key, options);
+    const safeT = (key: string, options?: any) => i18next.t(key, options) as string;
 
     const [viewMode, setViewMode] = useState<'auth' | 'sync'>(initialViewMode);
     const [isLogin, setIsLogin] = useState(true);
@@ -71,7 +71,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
             if (event === 'SIGNED_IN' && session) {
                 console.log('AuthModal: User signed in (event), checking guest recipes...');
                 // Avoid double processing if already handled manually
-                if (loading) return;
+                // if (loading) return; // Fix: Allow listener to trigger checkGuestRecipes even if loading
                 await checkGuestRecipes(session.user.id);
             }
         });
@@ -440,9 +440,6 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                     <>
                                         <Text style={styles.infoText}>
                                             {safeT('auth_modal.info.login_desc')}
-                                        </Text>
-                                        <Text style={styles.infoTextSmall}>
-                                            {safeT('auth_modal.info.login_sub')}
                                         </Text>
                                     </>
                                 ) : (

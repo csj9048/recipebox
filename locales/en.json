@@ -62,8 +62,7 @@
             "forgot_password": "Forgot Password?"
         },
         "info": {
-            "login_desc": "Sign in with your existing account\\nto see your saved recipes.",
-            "login_sub": "Recipes created on this device will be hidden after logout",
+            "login_desc": "Log in to keep your recipes safe.",
             "signup_desc": "Sign up to safely save recipes\\ncreated on this device to your account."
         },
         "sync": {
