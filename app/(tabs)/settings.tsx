@@ -196,7 +196,7 @@ export default function SettingsScreen() {
                         <Ionicons name="chevron-forward" size={20} color={Colors.gray[300]} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.menuItem} onPress={() => Linking.openURL('https://bit.ly/45aSoSQ')}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => Linking.openURL('https://www.notion.so/csj9048/RecipeBox-2e8aabf0f5ad80e6b4bdf83f267ae5dc')}>
                         <Ionicons name="document-text-outline" size={24} color={Colors.text.primary} />
                         <Text style={styles.menuText}>{t('settings.menu.terms')}</Text>
                         <Ionicons name="chevron-forward" size={20} color={Colors.gray[300]} />
