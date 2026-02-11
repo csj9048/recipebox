@@ -231,7 +231,7 @@ export default function ShoppingScreen() {
             style={styles.iconButton}
             onPress={() => handleCoupangSearch(item.text)}
           >
-            <Ionicons name="cart-outline" size={20} color="#AE0000" />
+            <Ionicons name="cart-outline" size={24} color={Colors.primary} />
           </TouchableOpacity>
         )}
 
@@ -240,7 +240,7 @@ export default function ShoppingScreen() {
           style={styles.iconButton}
           onPress={() => handleDeleteItem(item.id)}
         >
-          <Ionicons name="trash-outline" size={20} color={Colors.gray[400]} />
+          <Ionicons name="trash-outline" size={20} color={Colors.error} />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
