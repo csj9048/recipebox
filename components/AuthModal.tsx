@@ -6,6 +6,8 @@ import * as WebBrowser from 'expo-web-browser';
 import { Colors } from '../constants/Colors';
 import { supabase } from '../utils/supabase/client';
 import { Ionicons } from '@expo/vector-icons';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { Image } from 'expo-image';
 import Toast from 'react-native-toast-message';
 import { getGuestRecipes, clearGuestRecipes } from '../utils/storage';
 import { convertImageToBase64, uploadImage } from '../utils/image';
@@ -40,12 +42,19 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
         AppleAuthentication.isAvailableAsync().then(setAppleAuthAvailable);
     }, []);
 
-    // Reset form when modal opens
-    React.useEffect(() => {
+    useEffect(() => {
         if (visible) {
             initializeModal();
         }
     }, [visible]);
+
+    useEffect(() => {
+        GoogleSignin.configure({
+            scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+            webClientId: '588369078442-ton21hl0rb8e62a9rq4e6mul3inktuer.apps.googleusercontent.com',
+            iosClientId: '588369078442-vm7nslq771fr0ioui5t0hefk6bvmsivo.apps.googleusercontent.com',
+        });
+    }, []);
 
     const initializeModal = async () => {
         setEmail('');
@@ -301,6 +310,43 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
         }
     };
 
+    const handleGoogleLogin = async () => {
+        setLoading(true);
+        try {
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+
+            if (userInfo.idToken) {
+                const { data, error } = await supabase.auth.signInWithIdToken({
+                    provider: 'google',
+                    token: userInfo.idToken,
+                });
+                console.log(error, data);
+
+                if (error) throw error;
+                // onSuccess will be triggered by onAuthStateChange in RootLayout
+                onSuccess?.();
+            } else {
+                throw new Error('no ID token present!');
+            }
+        } catch (error: any) {
+            console.error('Google login error:', error);
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                // play services not available or outdated
+                Alert.alert(safeT('common.error'), 'Google Play Services not available.');
+            } else {
+                // some other error happened
+                Alert.alert(safeT('auth_modal.alert.error_title'), 'Google Login Failed');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleSync = async () => {
         setLoading(true);
         try {
@@ -503,6 +549,21 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
                                         onPress={onAppleLogin}
                                     />
                                 )}
+
+                                <TouchableOpacity
+                                    style={[styles.socialButton, { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DDDDDD' }]}
+                                    onPress={handleGoogleLogin}
+                                    disabled={loading}
+                                >
+                                    <Image
+                                        source={require('../assets/google-logo.png')}
+                                        style={{ width: 20, height: 20 }}
+                                        contentFit="contain"
+                                    />
+                                    <Text style={[styles.socialButtonText, { color: '#000000' }]}>
+                                        Google로 계속하기
+                                    </Text>
+                                </TouchableOpacity>
 
                                 <TouchableOpacity
                                     style={styles.switchButton}

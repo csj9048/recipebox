@@ -18,12 +18,31 @@
       "bundleIdentifier": "com.recipebox.app.ios",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.588369078442-vm7nslq771fr0ioui5t0hefk6bvmsivo"
+            ]
+          }
+        ],
         "ITSAppUsesNonExemptEncryption": false,
         "NSUserTrackingUsageDescription": "사용자의 앱 사용 패턴을 분석하여 더 나은 서비스를 제공하기 위해 사용됩니다.",
         "NSPhotoLibraryUsageDescription": "레시피에 사진을 첨부하기 위해 사진 라이브러리에 접근합니다. 선택한 사진은 레시피의 썸네일이나 본문 이미지로 사용됩니다.",
         "NSCameraUsageDescription": "레시피 사진 촬영을 위해 카메라에 접근합니다."
-      }
+      },
+      "bundleIdentifier": "com.recipebox.app.ios",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ]
     "android": {
       "splash": {
         "image": "./assets/adaptive-icon.png",
@@ -74,7 +93,8 @@
         }
       ],
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "@react-native-google-signin/google-signin"
     ]
   }
 }
