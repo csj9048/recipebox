@@ -228,7 +228,7 @@ export default function ShoppingScreen() {
         {/* Coupang Search Button (KR only) */}
         {isKorea && !item.is_completed && (
           <TouchableOpacity
-            style={[styles.iconButton, { backgroundColor: '#E6F0FD' }]}
+            style={styles.iconButton}
             onPress={() => handleCoupangSearch(item.text)}
           >
             <Ionicons name="cart-outline" size={20} color="#AE0000" />
