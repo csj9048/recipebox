@@ -16,6 +16,7 @@ import {
   deleteGuestShoppingItem,
   clearGuestShoppingList
 } from '../../utils/storage';
+import { coupangLinks } from '../../utils/coupangLinks';
 
 interface ShoppingItem {
   id: string;
