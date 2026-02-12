@@ -194,7 +194,7 @@ export default function ShoppingScreen() {
     );
   };
 
-  import { coupangLinks } from '../../utils/coupangLinks';
+
 
   // ...
 

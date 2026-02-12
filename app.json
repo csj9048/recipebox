@@ -2,7 +2,7 @@
   "expo": {
     "name": "RecipeBox",
     "slug": "recipe-box",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -42,7 +42,7 @@
         "backgroundColor": "#FBBB02"
       },
       "package": "com.recipebox.app",
-      "versionCode": 13,
+      "versionCode": 14,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
