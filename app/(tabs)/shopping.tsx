@@ -193,11 +193,21 @@ export default function ShoppingScreen() {
     );
   };
 
+  import { coupangLinks } from '../../utils/coupangLinks';
+
+  // ...
+
   const handleCoupangSearch = (text: string) => {
-    // Open Coupang search.
-    // In the future, this can be replaced with a Partners link.
-    const url = `https://m.coupang.com/nm/search?q=${encodeURIComponent(text)}`;
-    Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
+    // Check if there is a direct link for the exact keyword
+    const link = coupangLinks[text];
+
+    if (link) {
+      Linking.openURL(link).catch(err => console.error("Couldn't load page", err));
+    } else {
+      // Default to search if no specific link found
+      const url = `https://m.coupang.com/nm/search?q=${encodeURIComponent(text)}`;
+      Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
+    }
   };
 
   const sortedItems = [...items].sort((a, b) => {
