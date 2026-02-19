@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Platform, View } from 'react-native';
+import { Platform, View, LogBox } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as Linking from 'expo-linking';
@@ -20,6 +20,11 @@ import { useTranslation } from 'react-i18next';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+// Ignore specific warnings
+LogBox.ignoreLogs([
+  'AuthApiError: Invalid Refresh Token: Refresh Token Not Found',
+]);
 
 // App Open Ad Unit IDs (Use TestIds for now)
 const adUnitId = __DEV__

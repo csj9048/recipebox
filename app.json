@@ -2,7 +2,7 @@
   "expo": {
     "name": "RecipeBox",
     "slug": "recipe-box",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,12 +16,13 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.recipebox.app.ios",
+      "buildNumber": "19",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "CFBundleURLTypes": [
           {
             "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.588369078442-vm7nslq771fr0ioui5t0hefk6bvmsivo"
+              "com.googleusercontent.apps.189700867975-rie9hhoe8t4ib19bte0u46v6k50da66m"
             ]
           }
         ],
@@ -42,7 +43,7 @@
         "backgroundColor": "#FBBB02"
       },
       "package": "com.recipebox.app",
-      "versionCode": 16,
+      "versionCode": 19,
       "googleServicesFile": "./google-services.json"
     },
     "web": {

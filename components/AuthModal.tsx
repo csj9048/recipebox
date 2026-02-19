@@ -52,7 +52,7 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
         GoogleSignin.configure({
             webClientId: '189700867975-0b4furd1tetrr0l4dh8sj80m2jgag4um.apps.googleusercontent.com',
             // iOS Client ID will need to be updated after downloading fresh GoogleService-Info.plist
-            iosClientId: '588369078442-vm7nslq771fr0ioui5t0hefk6bvmsivo.apps.googleusercontent.com',
+            iosClientId: '189700867975-rie9hhoe8t4ib19bte0u46v6k50da66m.apps.googleusercontent.com',
             offlineAccess: true,
         });
     }, []);
@@ -316,15 +316,45 @@ export function AuthModal({ visible, onClose, onSuccess, initialViewMode = 'auth
         setLoading(true);
         try {
             await GoogleSignin.hasPlayServices();
-            const response = await GoogleSignin.signIn();
 
+            // Generate a random nonce
+            const nonce = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+            // Re-configure with the nonce
+            GoogleSignin.configure({
+                webClientId: '189700867975-0b4furd1tetrr0l4dh8sj80m2jgag4um.apps.googleusercontent.com',
+                iosClientId: '189700867975-rie9hhoe8t4ib19bte0u46v6k50da66m.apps.googleusercontent.com',
+                offlineAccess: true,
+                nonce: nonce, // Pass the raw nonce to Google
+            } as any);
+
+            // GIDConfiguration doesn't support nonce, but we patched the native module to accept it in signIn options
+            const response = await GoogleSignin.signIn({ nonce } as any);
+
+            // Check both potential locations for idToken (v13+ uses data.idToken)
             // Check both potential locations for idToken (v13+ uses data.idToken)
             const idToken = response.data?.idToken || response.idToken;
 
             if (idToken) {
+                try {
+                    // Decode JWT (header.payload.signature)
+                    const parts = idToken.split('.');
+                    if (parts.length === 3) {
+                        const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+                        console.log('Decoded ID Token Nonce:', payload.nonce);
+                        console.log('Expected Nonce:', nonce);
+                        if (payload.nonce !== nonce) {
+                            console.error('CRITICAL: Nonce mismatch! Google ignored our nonce.');
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to decode ID token:', e);
+                }
+
                 const { data, error } = await supabase.auth.signInWithIdToken({
                     provider: 'google',
                     token: idToken,
+                    nonce: nonce, // Pass the raw nonce to Supabase for verification
                 });
                 console.log(error, data);
 

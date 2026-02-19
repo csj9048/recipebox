@@ -63,11 +63,9 @@ export default function SettingsScreen() {
 
     const handleReview = () => {
         if (Platform.OS === 'ios') {
-            // TODO: Replace with actual App ID after release
-            Linking.openURL('https://apps.apple.com/app/id6739487321?action=write-review');
+            Linking.openURL('https://apps.apple.com/us/app/recipe-box/id6758030238?action=write-review');
         } else {
-            const packageName = Constants.expoConfig?.android?.package || 'com.recipebox.app';
-            Linking.openURL(`market://details?id=${packageName}`);
+            Linking.openURL('https://play.google.com/store/apps/details?id=com.recipebox.app&hl=ko');
         }
     };
 
